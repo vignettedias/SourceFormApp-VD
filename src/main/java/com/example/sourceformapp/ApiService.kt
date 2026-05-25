@@ -1,39 +1,27 @@
 package com.example.sourceformapp
 
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-
-import retrofit2.Response
-
-import retrofit2.http.Header
-import retrofit2.http.Multipart
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Part
+
+data class LoginRequest(
+    val email: String,
+    val password: String
+)
+
+data class LoginResponse(
+    val success: Boolean,
+    val token: String?
+)
 
 interface ApiService {
 
-    @Multipart
-    @POST("api/submit")
+    @POST("login")
+    fun loginUser(
+        @Body request: LoginRequest
+    ): Call<LoginResponse>
 
-    suspend fun uploadForm(
-
-        @Header("Authorization")
-        authToken: String,
-
-        @Part("name")
-        name: RequestBody,
-
-        @Part("email")
-        email: RequestBody,
-
-        @Part("phone")
-        phone: RequestBody,
-
-        @Part("description")
-        description: RequestBody,
-
-        @Part
-        file: MultipartBody.Part
-
-    ): Response<Unit>
+    @GET("status")
+    fun checkServerStatus(): Call<String>
 }
