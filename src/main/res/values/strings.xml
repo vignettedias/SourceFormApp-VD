@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- - -->
+    <!-- App Name -->
+    <!-- - -->
+
+    <string name="app_name">
+        SourceFormApp
+    </string>
+
+    <!-- - -->
+    <!-- Facebook SDK -->
+    <!-- - -->
+
+    <string name="facebook_app_id">
+        1758724028442117
+    </string>
+
+    <string name="facebook_client_token">
+        6dee5755ac47f87aa391bfa5f717b06d
+    </string>
+
+</resources>

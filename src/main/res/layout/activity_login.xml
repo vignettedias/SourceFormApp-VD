@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+
+    android:gravity="center"
+
+    android:background="#121212"
+
+    android:padding="24dp">
+
+    <!-- - -->
+    <!-- Logo / Branding -->
+    <!-- - -->
+
+    <TextView
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:text="SourceForm"
+
+        android:textColor="#FFFFFF"
+
+        android:textStyle="bold"
+
+        android:textSize="38sp"
+
+        android:letterSpacing="0.03"
+
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:text="Secure Cloud Intake System"
+
+        android:textColor="#B3B3B3"
+
+        android:textSize="15sp"
+
+        android:layout_marginBottom="42dp"/>
+
+    <!-- - -->
+    <!-- Auth Card -->
+    <!-- - -->
+
+    <androidx.cardview.widget.CardView
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        app:cardCornerRadius="26dp"
+
+        app:cardElevation="12dp"
+
+        app:cardBackgroundColor="#1E1E1E">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="24dp">
+
+            <!-- Welcome -->
+
+            <TextView
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Welcome Back"
+
+                android:textColor="#FFFFFF"
+
+                android:textSize="26sp"
+
+                android:textStyle="bold"
+
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Authenticate to continue"
+
+                android:textColor="#B3B3B3"
+
+                android:textSize="14sp"
+
+                android:layout_marginBottom="30dp"/>
+
+            <!-- Google -->
+
+            <Button
+
+                android:id="@+id/btnGoogle"
+
+                android:layout_width="match_parent"
+
+                android:layout_height="58dp"
+
+                android:text="Continue with Google"
+
+                android:textStyle="bold"
+
+                android:textColor="#FFFFFF"
+
+                android:textSize="16sp"
+
+                android:backgroundTint="#B794F4"/>
+
+            <!-- GitHub -->
+
+            <Button
+
+                android:id="@+id/btnGithub"
+
+                android:layout_width="match_parent"
+
+                android:layout_height="58dp"
+
+                android:layout_marginTop="18dp"
+
+                android:text="Continue with GitHub"
+
+                android:textStyle="bold"
+
+                android:textColor="#FFFFFF"
+
+                android:textSize="16sp"
+
+                android:backgroundTint="#374151"/>
+
+            <!-- Facebook -->
+
+            <Button
+
+                android:id="@+id/btnFacebook"
+
+                android:layout_width="match_parent"
+
+                android:layout_height="58dp"
+
+                android:layout_marginTop="18dp"
+
+                android:text="Continue with Facebook"
+
+                android:textStyle="bold"
+
+                android:textColor="#FFFFFF"
+
+                android:textSize="16sp"
+
+                android:backgroundTint="#2563EB"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Footer -->
+
+    <TextView
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:text="Distributed Mobile Intake Platform"
+
+        android:textColor="#6B7280"
+
+        android:textSize="13sp"
+
+        android:layout_marginTop="30dp"/>
+</LinearLayout>
