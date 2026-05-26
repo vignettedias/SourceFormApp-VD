@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="#0B0B0F"
+
+    android:fillViewport="true">
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+
+        android:padding="20dp">
+
+        <!-- HEADER -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="SourceForm"
+
+            android:textColor="#FFFFFF"
+
+            android:textSize="34sp"
+
+            android:textStyle="bold"
+
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Cloud Connected Intake System"
+
+            android:textColor="#B3B3B3"
+
+            android:textSize="13sp"
+
+            android:layout_marginTop="2dp"
+
+            android:layout_gravity="center"/>
+
+        <!-- CONNECTION STATUS -->
+
+        <LinearLayout
+
+            android:id="@+id/statusContainer"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+
+            android:layout_gravity="center"
+
+            android:layout_marginTop="12dp"
+
+            android:layout_marginBottom="18dp"
+
+            android:background="@drawable/secondary_button">
+
+            <View
+                android:id="@+id/statusDot"
+
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+
+                android:layout_gravity="center_vertical"
+
+                android:backgroundTint="#22C55E"/>
+
+            <TextView
+                android:id="@+id/tvConnectionStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text=" Backend Connected"
+
+                android:textColor="#FFFFFF"
+
+                android:textStyle="bold"
+
+                android:textSize="13sp"
+
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <!-- MAIN CARD -->
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="18dp"
+
+            android:background="@drawable/edittext_bg">
+
+            <!-- NAME -->
+
+            <EditText
+                android:id="@+id/etName"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:hint="Full Name"
+
+                android:textColor="#FFFFFF"
+
+                android:textColorHint="#7B7B7B"
+
+                android:background="@drawable/edittext_bg"
+
+                android:maxLength="50"
+
+                android:padding="12dp"/>
+
+            <!-- EMAIL -->
+
+            <EditText
+                android:id="@+id/etEmail"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="14dp"
+
+                android:hint="Email Address"
+
+                android:inputType="textEmailAddress"
+
+                android:textColor="#FFFFFF"
+
+                android:textColorHint="#7B7B7B"
+
+                android:background="@drawable/edittext_bg"
+
+                android:padding="12dp"/>
+
+            <TextView
+                android:id="@+id/tvEmailStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textSize="12sp"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <!-- PHONE -->
+
+            <EditText
+                android:id="@+id/etPhone"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="14dp"
+
+                android:hint="Phone Number"
+
+                android:inputType="phone"
+
+                android:maxLength="10"
+
+                android:textColor="#FFFFFF"
+
+                android:textColorHint="#7B7B7B"
+
+                android:background="@drawable/edittext_bg"
+
+                android:padding="12dp"/>
+
+            <TextView
+                android:id="@+id/tvPhoneStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:textSize="12sp"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <!-- DESCRIPTION -->
+
+            <EditText
+                android:id="@+id/etDescription"
+
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+
+                android:layout_marginTop="14dp"
+
+                android:gravity="top"
+
+                android:hint="Description"
+
+                android:textColor="#FFFFFF"
+
+                android:textColorHint="#7B7B7B"
+
+                android:background="@drawable/edittext_bg"
+
+                android:padding="12dp"/>
+
+            <TextView
+                android:id="@+id/tvWordCount"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="0 / 140 words"
+
+                android:textColor="#B3B3B3"
+
+                android:textSize="12sp"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <!-- FILE BUTTON -->
+
+            <Button
+                android:id="@+id/btnChooseFile"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="20dp"
+
+                android:text="Choose PDF/DOC File"
+
+                android:textAllCaps="false"
+
+                android:textColor="#FFFFFF"
+
+                android:textStyle="bold"
+
+                android:textSize="15sp"
+
+                android:background="@drawable/primary_button"
+
+                android:padding="12dp"/>
+
+            <!-- FILE NAME -->
+
+            <TextView
+                android:id="@+id/tvFileName"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="No file selected"
+
+                android:textColor="#D1D5DB"
+
+                android:textStyle="bold"
+
+                android:textSize="13sp"
+
+                android:layout_marginTop="10dp"/>
+
+            <!-- QR BUTTON -->
+
+            <Button
+                android:id="@+id/btnScanQR"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="18dp"
+
+                android:text="Scan Backend QR"
+
+                android:textAllCaps="false"
+
+                android:textColor="#FFFFFF"
+
+                android:textStyle="bold"
+
+                android:textSize="15sp"
+
+                android:background="@drawable/secondary_button"
+
+                android:padding="12dp"/>
+
+            <!-- SUBMIT -->
+
+            <Button
+                android:id="@+id/btnSubmit"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="20dp"
+
+                android:text="Submit Form"
+
+                android:textAllCaps="false"
+
+                android:textColor="#FFFFFF"
+
+                android:textStyle="bold"
+
+                android:textSize="16sp"
+
+                android:background="@drawable/primary_button"
+
+                android:padding="14dp"/>
+
+            <!-- PROGRESS BAR -->
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+
+                android:layout_gravity="center"
+
+                android:layout_marginTop="14dp"
+
+                android:visibility="gone"/>
+
+            <!-- SUCCESS CARD -->
+
+            <LinearLayout
+                android:id="@+id/successCard"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="14dp"
+
+                android:orientation="vertical"
+
+                android:padding="16dp"
+
+                android:visibility="gone"
+
+                android:background="@drawable/success_card_bg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Upload Successful"
+
+                    android:textColor="#FFFFFF"
+
+                    android:textStyle="bold"
+
+                    android:textSize="18sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Form submitted to cloud backend"
+
+                    android:textColor="#E7FCEB"
+
+                    android:textSize="13sp"
+
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <!-- LOGOUT -->
+
+            <Button
+                android:id="@+id/btnLogout"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginTop="18dp"
+
+                android:text="Logout"
+
+                android:textAllCaps="false"
+
+                android:textColor="#FFFFFF"
+
+                android:textStyle="bold"
+
+                android:textSize="15sp"
+
+                android:backgroundTint="#DC2626"
+
+                android:padding="12dp"/>
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
