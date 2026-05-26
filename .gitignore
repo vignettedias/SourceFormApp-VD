@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.iml
 .gradle
 /local.properties
@@ -13,3 +14,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+=======
+/build
+google-services.json
+>>>>>>> f099b542ec21070be890937a7583b4a81e011c3b
