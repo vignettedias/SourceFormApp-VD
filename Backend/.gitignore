@@ -1,4 +1,11 @@
-firebase-service-account.json
+firebase-service-account.json.json
 node_modules
 .env
 google-services.json
+uploads/
+
+
+        git commit -m "Removed Firebase credentials and finalized production repository"
+
+        git push -u origin main
+
