@@ -309,7 +309,7 @@ covering:
 Developed as part of:
 
 ```text
-Task 1 Internship Project
+Summer Internship Project
 ```
 
 Focused on:
