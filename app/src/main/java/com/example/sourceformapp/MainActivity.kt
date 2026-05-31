@@ -1,12 +1,10 @@
 package com.example.sourceformapp
 
 import kotlinx.coroutines.tasks.await
-
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
@@ -18,35 +16,22 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-
 import com.google.firebase.auth.FirebaseAuth
-
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-
 import java.io.File
 import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
-
-    // -----------------------------------------
-    // UI
-    // -----------------------------------------
 
     private lateinit var etName: EditText
     private lateinit var etEmail: EditText
@@ -71,47 +56,6 @@ class MainActivity : AppCompatActivity() {
     private var selectedFileUri: Uri? = null
 
     // -----------------------------------------
-    // BACKEND URL
-    // -----------------------------------------
-
-    private lateinit var backendURL: String
-
-    // -----------------------------------------
-    // QR SCANNER
-    // -----------------------------------------
-
-    private val qrLauncher =
-        registerForActivityResult(
-            ScanContract()
-        ) { result ->
-
-            if (result.contents != null) {
-
-                val scannedURL =
-                    result.contents
-
-                backendURL =
-                    scannedURL
-
-                RetrofitClient.setBaseUrl(
-                    backendURL
-                )
-
-                Toast.makeText(
-
-                    this,
-
-                    "QR Backend Connected",
-
-                    Toast.LENGTH_LONG
-
-                ).show()
-
-                updateConnectionStatus(true)
-            }
-        }
-
-    // -----------------------------------------
     // FILE PICKER
     // -----------------------------------------
 
@@ -131,10 +75,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    // -----------------------------------------
-    // ON CREATE
-    // -----------------------------------------
-
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
@@ -153,57 +93,9 @@ class MainActivity : AppCompatActivity() {
 
         setupFocusEffects()
 
-        setupBackendConnection()
+        checkBackendStatus()
 
         validateFields()
-    }
-
-    // -----------------------------------------
-    // BACKEND CONNECTION
-    // -----------------------------------------
-
-    private fun setupBackendConnection() {
-
-        val isEmulator =
-
-            Build.FINGERPRINT.contains("generic")
-                    ||
-                    Build.MODEL.contains("google_sdk")
-                    ||
-                    Build.MODEL.contains("Emulator")
-                    ||
-                    Build.MODEL.contains("Android SDK")
-
-        backendURL =
-
-            if (isEmulator) {
-
-                // Emulator backend
-
-                "http://10.0.2.2:5000/"
-
-            } else {
-
-                // Real device backend
-
-                "http://10.56.39.223:5000/"
-            }
-
-        RetrofitClient.setBaseUrl(
-            backendURL
-        )
-
-        Toast.makeText(
-
-            this,
-
-            "Backend Connected",
-
-            Toast.LENGTH_SHORT
-
-        ).show()
-
-        updateConnectionStatus(true)
     }
 
     // -----------------------------------------
@@ -266,19 +158,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.btnChooseFile
             )
 
-        val btnScanQR =
-            findViewById<Button>(
-                R.id.btnScanQR
-            )
-
         btnChooseFile.setOnClickListener {
 
             filePicker.launch("*/*")
-        }
-
-        btnScanQR.setOnClickListener {
-
-            openQRScanner()
         }
 
         btnSubmit.setOnClickListener {
@@ -357,14 +239,36 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun checkBackendStatus() {
 
+        CoroutineScope(Dispatchers.IO).launch {
+
+            try {
+
+                val response =
+                    RetrofitClient.api.healthCheck()
+
+                runOnUiThread {
+
+                    updateConnectionStatus(
+                        response.isSuccessful
+                    )
+                }
+
+            } catch (e: Exception) {
+
+                runOnUiThread {
+
+                    updateConnectionStatus(false)
+                }
+            }
+        }
+    }
     // -----------------------------------------
     // VALIDATION
     // -----------------------------------------
 
     private fun setupValidation() {
-
-        // EMAIL
 
         etEmail.addTextChangedListener(
 
@@ -426,8 +330,6 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        // PHONE
-
         etPhone.addTextChangedListener(
 
             object : TextWatcher {
@@ -487,8 +389,6 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        // DESCRIPTION
-
         etDescription.addTextChangedListener(
 
             object : TextWatcher {
@@ -531,7 +431,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // -----------------------------------------
-    // VALIDATE FIELDS
+    // VALIDATE
     // -----------------------------------------
 
     private fun validateFields() {
@@ -597,26 +497,6 @@ class MainActivity : AppCompatActivity() {
                     Color.RED
                 )
         }
-    }
-
-    // -----------------------------------------
-    // QR SCANNER
-    // -----------------------------------------
-
-    private fun openQRScanner() {
-
-        val options =
-            ScanOptions()
-
-        options.setPrompt(
-            "Scan Backend QR"
-        )
-
-        options.setBeepEnabled(true)
-
-        options.setOrientationLocked(true)
-
-        qrLauncher.launch(options)
     }
 
     // -----------------------------------------
@@ -695,39 +575,36 @@ class MainActivity : AppCompatActivity() {
 
                     val response =
 
-                        RetrofitClient
-                            .getClient()
+                        RetrofitClient.api.uploadForm(
 
-                            .uploadForm(
+                            authHeader,
 
-                                authHeader,
+                            etName.text.toString()
+                                .toRequestBody(
+                                    "text/plain"
+                                        .toMediaTypeOrNull()
+                                ),
 
-                                etName.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
+                            etEmail.text.toString()
+                                .toRequestBody(
+                                    "text/plain"
+                                        .toMediaTypeOrNull()
+                                ),
 
-                                etEmail.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
+                            etPhone.text.toString()
+                                .toRequestBody(
+                                    "text/plain"
+                                        .toMediaTypeOrNull()
+                                ),
 
-                                etPhone.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
+                            etDescription.text.toString()
+                                .toRequestBody(
+                                    "text/plain"
+                                        .toMediaTypeOrNull()
+                                ),
 
-                                etDescription.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
-
-                                multipart
-                            )
+                            multipart
+                        )
 
                     runOnUiThread {
 

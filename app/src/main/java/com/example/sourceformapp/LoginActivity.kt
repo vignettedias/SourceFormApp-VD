@@ -1,7 +1,6 @@
 package com.example.sourceformapp
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -9,27 +8,22 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.OAuthProvider
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,117 +31,40 @@ import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
 
-    // -------------------------------------
-    // UI
-    // -------------------------------------
+    private lateinit var etName: EditText
+    private lateinit var etEmail: EditText
+    private lateinit var etPassword: EditText
 
-    private lateinit var etName:
-            EditText
+    private lateinit var btnSignup: Button
+    private lateinit var btnLogin: Button
+    private lateinit var btnGoogle: Button
+    private lateinit var btnGithub: Button
+    private lateinit var btnFacebook: Button
 
-    private lateinit var etEmail:
-            EditText
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvSwitchMode: TextView
 
-    private lateinit var etPassword:
-            EditText
+    private var isSignupMode = true
 
-    private lateinit var btnSignup:
-            Button
+    private lateinit var sessionManager: SessionManager
 
-    private lateinit var btnLogin:
-            Button
+    private lateinit var googleSignInClient: GoogleSignInClient
 
-    private lateinit var btnGoogle:
-            Button
+    private lateinit var auth: FirebaseAuth
 
-    private lateinit var btnGithub:
-            Button
+    private lateinit var callbackManager: CallbackManager
 
-    private lateinit var btnFacebook:
-            Button
-
-    private lateinit var progressBar:
-            ProgressBar
-
-    private lateinit var tvSwitchMode:
-            TextView
-
-    // -------------------------------------
-    // MODE
-    // -------------------------------------
-
-    private var isSignupMode =
-        true
-
-    // -------------------------------------
-    // SESSION
-    // -------------------------------------
-
-    private lateinit var sessionManager:
-            SessionManager
-
-    // -------------------------------------
-    // GOOGLE
-    // -------------------------------------
-
-    private lateinit var googleSignInClient:
-            GoogleSignInClient
-
-    // -------------------------------------
-    // FIREBASE
-    // -------------------------------------
-
-    private lateinit var auth:
-            FirebaseAuth
-
-    // -------------------------------------
-    // FACEBOOK
-    // -------------------------------------
-
-    private lateinit var callbackManager:
-            CallbackManager
-
-    // -------------------------------------
-    // BACKEND
-    // -------------------------------------
-
-    private lateinit var backendURL:
-            String
-
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
+    override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        setContentView(
-            R.layout.activity_login
-        )
+        setContentView(R.layout.activity_login)
 
-        // ---------------------------------
-        // BACKEND SETUP
-        // ---------------------------------
+        sessionManager = SessionManager(this)
 
-        setupBackendConnection()
-
-        // ---------------------------------
-        // INIT SESSION
-        // ---------------------------------
-
-        sessionManager =
-            SessionManager(this)
-
-        // ---------------------------------
-        // AUTO LOGIN
-        // ---------------------------------
-
-        if (
-
-            sessionManager.isLoggedIn()
-
-        ) {
+        if (sessionManager.isLoggedIn()) {
 
             startActivity(
-
                 Intent(
                     this,
                     MainActivity::class.java
@@ -156,10 +73,6 @@ class LoginActivity : AppCompatActivity() {
 
             finish()
         }
-
-        // ---------------------------------
-        // UI INIT
-        // ---------------------------------
 
         etName =
             findViewById(R.id.etName)
@@ -191,33 +104,19 @@ class LoginActivity : AppCompatActivity() {
         tvSwitchMode =
             findViewById(R.id.tvSwitchMode)
 
-        // ---------------------------------
-        // FIREBASE
-        // ---------------------------------
-
         auth =
             FirebaseAuth.getInstance()
-
-        // ---------------------------------
-        // FACEBOOK
-        // ---------------------------------
 
         callbackManager =
             CallbackManager.Factory.create()
 
-        // ---------------------------------
-        // GOOGLE CONFIG
-        // ---------------------------------
-
         val gso =
-            GoogleSignInOptions.Builder(
 
-                GoogleSignInOptions
-                    .DEFAULT_SIGN_IN
+            GoogleSignInOptions.Builder(
+                GoogleSignInOptions.DEFAULT_SIGN_IN
             )
 
                 .requestIdToken(
-
                     getString(
                         R.string.default_web_client_id
                     )
@@ -234,10 +133,6 @@ class LoginActivity : AppCompatActivity() {
                 gso
             )
 
-        // ---------------------------------
-        // SWITCH MODE
-        // ---------------------------------
-
         tvSwitchMode.setOnClickListener {
 
             isSignupMode =
@@ -246,45 +141,25 @@ class LoginActivity : AppCompatActivity() {
             updateModeUI()
         }
 
-        // ---------------------------------
-        // SIGNUP
-        // ---------------------------------
-
         btnSignup.setOnClickListener {
 
             signup()
         }
-
-        // ---------------------------------
-        // LOGIN
-        // ---------------------------------
 
         btnLogin.setOnClickListener {
 
             login()
         }
 
-        // ---------------------------------
-        // GOOGLE
-        // ---------------------------------
-
         btnGoogle.setOnClickListener {
 
             signInGoogle()
         }
 
-        // ---------------------------------
-        // GITHUB
-        // ---------------------------------
-
         btnGithub.setOnClickListener {
 
             githubLogin()
         }
-
-        // ---------------------------------
-        // FACEBOOK
-        // ---------------------------------
 
         btnFacebook.setOnClickListener {
 
@@ -294,55 +169,9 @@ class LoginActivity : AppCompatActivity() {
         updateModeUI()
     }
 
-    // -------------------------------------
-    // BACKEND CONNECTION
-    // -------------------------------------
-
-    private fun setupBackendConnection() {
-
-        val isEmulator =
-
-            Build.FINGERPRINT.contains("generic")
-                    ||
-                    Build.MODEL.contains("google_sdk")
-                    ||
-                    Build.MODEL.contains("Emulator")
-                    ||
-                    Build.MODEL.contains("Android SDK")
-
-        backendURL =
-
-            if (isEmulator) {
-
-                // Emulator
-
-                "http://10.0.2.2:5000/"
-
-            } else {
-
-                // Real Device
-
-                "http://10.56.39.223:5000/"
-            }
-
-        RetrofitClient.setBaseUrl(
-            backendURL
-        )
-
-        Toast.makeText(
-
-            this,
-
-            "Backend Connected",
-
-            Toast.LENGTH_SHORT
-
-        ).show()
-    }
-
-    // -------------------------------------
-    // UPDATE UI
-    // -------------------------------------
+    // -----------------------------------------
+    // UI MODE
+    // -----------------------------------------
 
     private fun updateModeUI() {
 
@@ -376,9 +205,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // SIGNUP
-    // -------------------------------------
+    // -----------------------------------------
 
     private fun signup() {
 
@@ -402,17 +231,14 @@ class LoginActivity : AppCompatActivity() {
 
                 val response =
 
-                    RetrofitClient
-                        .getClient()
+                    RetrofitClient.api.signup(
 
-                        .signup(
-
-                            SignupRequest(
-                                name,
-                                email,
-                                password
-                            )
+                        SignupRequest(
+                            name,
+                            email,
+                            password
                         )
+                    )
 
                 withContext(
                     Dispatchers.Main
@@ -422,29 +248,27 @@ class LoginActivity : AppCompatActivity() {
                         View.GONE
 
                     if (
-
                         response.isSuccessful
-
                     ) {
 
                         val body =
                             response.body()
 
                         if (
-
-                            body != null &&
-                            body.success &&
+                            body != null
+                            &&
+                            body.success
+                            &&
                             body.token != null
-
                         ) {
 
-                            sessionManager
-                                .saveToken(
-                                    body.token
-                                )
+                            sessionManager.saveToken(
+                                body.token
+                            )
 
-                            sessionManager
-                                .setLoggedIn(true)
+                            sessionManager.setLoggedIn(
+                                true
+                            )
 
                             Toast.makeText(
 
@@ -506,9 +330,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // LOGIN
-    // -------------------------------------
+    // -----------------------------------------
 
     private fun login() {
 
@@ -529,16 +353,13 @@ class LoginActivity : AppCompatActivity() {
 
                 val response =
 
-                    RetrofitClient
-                        .getClient()
+                    RetrofitClient.api.login(
 
-                        .login(
-
-                            LoginRequest(
-                                email,
-                                password
-                            )
+                        LoginRequest(
+                            email,
+                            password
                         )
+                    )
 
                 withContext(
                     Dispatchers.Main
@@ -548,29 +369,27 @@ class LoginActivity : AppCompatActivity() {
                         View.GONE
 
                     if (
-
                         response.isSuccessful
-
                     ) {
 
                         val body =
                             response.body()
 
                         if (
-
-                            body != null &&
-                            body.success &&
+                            body != null
+                            &&
+                            body.success
+                            &&
                             body.token != null
-
                         ) {
 
-                            sessionManager
-                                .saveToken(
-                                    body.token
-                                )
+                            sessionManager.saveToken(
+                                body.token
+                            )
 
-                            sessionManager
-                                .setLoggedIn(true)
+                            sessionManager.setLoggedIn(
+                                true
+                            )
 
                             Toast.makeText(
 
@@ -632,35 +451,30 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // GOOGLE LOGIN
-    // -------------------------------------
+    // -----------------------------------------
 
     private fun signInGoogle() {
 
         launcher.launch(
-
             googleSignInClient.signInIntent
         )
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // GITHUB LOGIN
-    // -------------------------------------
+    // -----------------------------------------
 
     private fun githubLogin() {
 
         val provider =
-
-            OAuthProvider
-                .newBuilder(
-                    "github.com"
-                )
+            OAuthProvider.newBuilder(
+                "github.com"
+            )
 
         auth.startActivityForSignInWithProvider(
-
             this,
-
             provider.build()
         )
 
@@ -701,9 +515,9 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // FACEBOOK LOGIN
-    // -------------------------------------
+    // -----------------------------------------
 
     private fun facebookLogin() {
 
@@ -768,9 +582,9 @@ class LoginActivity : AppCompatActivity() {
             )
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // FACEBOOK TOKEN
-    // -------------------------------------
+    // -----------------------------------------
 
     private fun handleFacebookAccessToken(
         token: AccessToken
@@ -826,9 +640,9 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // -------------------------------------
+    // -----------------------------------------
     // GOOGLE RESULT
-    // -------------------------------------
+    // -----------------------------------------
 
     private val launcher =
 
@@ -918,34 +732,21 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-    // -------------------------------------
-    // FACEBOOK RESULT
-    // -------------------------------------
-
     override fun onActivityResult(
-
         requestCode: Int,
-
         resultCode: Int,
-
         data: Intent?
     ) {
 
         super.onActivityResult(
-
             requestCode,
-
             resultCode,
-
             data
         )
 
         callbackManager.onActivityResult(
-
             requestCode,
-
             resultCode,
-
             data
         )
     }

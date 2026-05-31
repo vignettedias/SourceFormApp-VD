@@ -1,133 +1,68 @@
 package com.example.sourceformapp
-import com.example.sourceformapp.BuildConfig
-import android.util.Log
+
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+
 object RetrofitClient {
 
     // -----------------------------------------
-    // ENVIRONMENT CONFIG
+    // CLOUD RUN BACKEND
     // -----------------------------------------
 
-    private const val DEV_URL =
-        "http://10.0.2.2:5000/"
-
-    private const val PROD_URL =
-        "https://your-production-domain.com/"
+    private const val BASE_URL =
+        "https://sourceform-backend-395254787380.asia-south1.run.app/"
 
     // -----------------------------------------
-    // ACTIVE BASE URL
+    // LOGGING
     // -----------------------------------------
 
-    private var BASE_URL =
+    private val logging =
+        HttpLoggingInterceptor().apply {
 
-        if (BuildConfig.DEBUG) {
-
-            DEV_URL
-
-        } else {
-
-            PROD_URL
+            level =
+                HttpLoggingInterceptor.Level.BODY
         }
 
     // -----------------------------------------
-    // SET DYNAMIC URL
+    // CLIENT
     // -----------------------------------------
 
-    fun setBaseUrl(
-        url: String
-    ) {
+    private val client =
+        OkHttpClient.Builder()
 
-        BASE_URL =
+            .addInterceptor(logging)
 
-            if (
-                url.endsWith("/")
-            ) {
+            .connectTimeout(
+                30,
+                TimeUnit.SECONDS
+            )
 
-                url
+            .readTimeout(
+                30,
+                TimeUnit.SECONDS
+            )
 
-            } else {
+            .writeTimeout(
+                30,
+                TimeUnit.SECONDS
+            )
 
-                "$url/"
-            }
+            .retryOnConnectionFailure(
+                true
+            )
 
-        Log.d(
-            "RetrofitClient",
-            "BASE URL UPDATED: $BASE_URL"
-        )
-    }
+            .build()
 
     // -----------------------------------------
-    // GET API CLIENT
+    // RETROFIT INSTANCE
     // -----------------------------------------
 
-    fun getClient(): ApiService {
+    val api: ApiService by lazy {
 
-        // -------------------------------------
-        // LOGGING
-        // -------------------------------------
-
-        val logging =
-            HttpLoggingInterceptor().apply {
-
-                level =
-
-                    if (BuildConfig.DEBUG) {
-
-                        HttpLoggingInterceptor
-                            .Level.BODY
-
-                    } else {
-
-                        HttpLoggingInterceptor
-                            .Level.NONE
-                    }
-            }
-
-        // -------------------------------------
-        // OKHTTP CLIENT
-        // -------------------------------------
-
-        val client =
-            OkHttpClient.Builder()
-
-                // Logging
-
-                .addInterceptor(logging)
-
-                // Timeouts
-
-                .connectTimeout(
-                    30,
-                    TimeUnit.SECONDS
-                )
-
-                .readTimeout(
-                    30,
-                    TimeUnit.SECONDS
-                )
-
-                .writeTimeout(
-                    30,
-                    TimeUnit.SECONDS
-                )
-
-                // Retry failed connections
-
-                .retryOnConnectionFailure(
-                    true
-                )
-
-                .build()
-
-        // -------------------------------------
-        // RETROFIT
-        // -------------------------------------
-
-        return Retrofit.Builder()
+        Retrofit.Builder()
 
             .baseUrl(BASE_URL)
 
