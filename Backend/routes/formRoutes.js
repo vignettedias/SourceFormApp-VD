@@ -1,4 +1,4 @@
-const verifyFirebaseToken =
+const verifyAuth =
     require("../middleware/authMiddleware")
 
 const express =
@@ -18,9 +18,8 @@ const fs =
 
 const rateLimit =
     require("express-rate-limit")
-
-const Form =
-    require("../models/FormModel")
+const admin =
+    require("../firebaseAdmin")
 
 const router =
     express.Router()
@@ -300,6 +299,21 @@ const allowedMimeTypes = [
 
     "*/*"
 ]
+// -------------------------------------
+// CLOUD RUN UPLOAD DIRECTORY
+// -------------------------------------
+
+const uploadsDir = "/tmp/uploads"
+
+if (!fs.existsSync(uploadsDir)) {
+
+    fs.mkdirSync(
+        uploadsDir,
+        {
+            recursive: true
+        }
+    )
+}
 
 // -------------------------------------
 // MULTER STORAGE
@@ -316,7 +330,7 @@ const storage =
 
             cb(
                 null,
-                "uploads/"
+                uploadsDir
             )
         },
 
@@ -327,7 +341,6 @@ const storage =
         ) => {
 
             const safeName =
-
                 generateSafeFileName(
                     file.originalname
                 )
@@ -452,7 +465,7 @@ router.post(
 
     uploadLimiter,
 
-    verifyFirebaseToken,
+    verifyAuth,
 
     upload.single("file"),
 
@@ -735,30 +748,46 @@ router.post(
             )
 
             console.log(
+                "AUTH TYPE:"
+            )
+
+            console.log(
+                req.user.authType
+            )
+
+            console.log(
                 "================================"
             )
 
-            // ---------------------------------
-            // SAVE TO DATABASE
-            // ---------------------------------
+ await admin
+    .firestore()
+    .collection("forms")
+    .add({
 
-            const formData =
-                new Form({
+        name,
 
-                    name,
+        email,
 
-                    email,
+        phone,
 
-                    phone,
+        description,
 
-                    description,
+        fileName:
+            req.file.filename,
 
-                    filePath:
-                        req.file.path
-                })
+        authEmail:
+            req.user.email,
 
-            await formData.save()
+        authType:
+            req.user.authType,
 
+        uploadedAt:
+            new Date()
+    })
+
+console.log(
+    "Firestore document created"
+)
             // ---------------------------------
             // SUCCESS
             // ---------------------------------

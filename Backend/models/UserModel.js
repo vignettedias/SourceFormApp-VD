@@ -1,107 +1,75 @@
-const mongoose =
-    require("mongoose")
+const admin =
+    require("../firebaseAdmin")
 
-const validator =
-    require("validator")
+const db =
+    admin.firestore()
 
-const UserSchema =
-    new mongoose.Schema({
+class UserModel {
 
-        name: {
+    static async findByEmail(email) {
 
-            type: String,
+        const snapshot =
 
-            required: true,
+            await db
+                .collection("users")
+                .where(
+                    "email",
+                    "==",
+                    email
+                )
+                .limit(1)
+                .get()
 
-            trim: true,
+        if (snapshot.empty)
+            return null
 
-            minlength: 2,
+        const doc =
+            snapshot.docs[0]
 
-            maxlength: 50
-        },
+        return {
 
-        email: {
+            id: doc.id,
 
-            type: String,
-
-            required: true,
-
-            unique: true,
-
-            lowercase: true,
-
-            trim: true,
-
-            validate: [
-
-                validator.isEmail,
-
-                "Invalid email format"
-            ]
-        },
-
-        password: {
-
-            type: String,
-
-            required: true,
-
-            minlength: 8
-        },
-
-        authProvider: {
-
-            type: String,
-
-            enum: [
-
-                "manual",
-
-                "google",
-
-                "github",
-
-                "facebook"
-            ],
-
-            default: "manual"
-        },
-
-        role: {
-
-            type: String,
-
-            enum: [
-
-                "user",
-
-                "admin"
-            ],
-
-            default: "user"
-        },
-
-        failedLoginAttempts: {
-
-            type: Number,
-
-            default: 0
-        },
-
-        accountLockedUntil: {
-
-            type: Date,
-
-            default: null
+            ...doc.data()
         }
+    }
 
-    }, {
+    static async findById(id) {
 
-        timestamps: true
-    })
+        const doc =
+
+            await db
+                .collection("users")
+                .doc(id)
+                .get()
+
+        if (!doc.exists)
+            return null
+
+        return {
+
+            id: doc.id,
+
+            ...doc.data()
+        }
+    }
+
+    static async create(data) {
+
+        const ref =
+
+            await db
+                .collection("users")
+                .add(data)
+
+        return {
+
+            id: ref.id,
+
+            ...data
+        }
+    }
+}
 
 module.exports =
-    mongoose.model(
-        "User",
-        UserSchema
-    )
+    UserModel

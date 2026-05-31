@@ -579,26 +579,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     // -----------------------------------------
-    // QR Scanner
-    // -----------------------------------------
-
-    private fun openQRScanner() {
-
-        val options =
-            ScanOptions()
-
-        options.setPrompt(
-            "Scan Backend QR"
-        )
-
-        options.setBeepEnabled(true)
-
-        options.setOrientationLocked(true)
-
-        qrLauncher.launch(options)
-    }
-
-    // -----------------------------------------
     // Upload Logic
     // -----------------------------------------
     private fun validateAndUpload() {

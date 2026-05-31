@@ -1,43 +1,43 @@
 global.crypto = require("crypto")
 
-const bonjour =
-    require("bonjour")()
-
-const qrcode =
-    require("qrcode-terminal")
-
-const express =
-    require("express")
-
-const mongoose =
-    require("mongoose")
-
-const helmet =
-    require("helmet")
-
-const rateLimit =
-    require("express-rate-limit")
-
-const cors =
-    require("cors")
-
-const network =
-    require("network")
-
 require("dotenv").config()
+const path = require("path")
+// -------------------------------------
+// IMPORTS
+// -------------------------------------
+
+const express = require("express")
+const helmet = require("helmet")
+const rateLimit = require("express-rate-limit")
+const cors = require("cors")
 
 // -------------------------------------
 // ROUTES
 // -------------------------------------
 
-const formRoutes =
-    require("./routes/formRoutes")
+const formRoutes = require("./routes/formRoutes")
+const authRoutes = require("./routes/authRoutes")
 
-const authRoutes =
-    require("./routes/authRoutes")
+// -------------------------------------
+// APP INIT
+// -------------------------------------
 
-const app =
-    express()
+const app = express()
+
+// -------------------------------------
+// CLOUD RUN SETTINGS
+// -------------------------------------
+
+app.set("trust proxy", 1)
+
+// -------------------------------------
+// UPLOADS DIRECTORY
+// -------------------------------------
+const uploadsDir = path.join(__dirname, "uploads")
+console.log("================================")
+console.log("Uploads directory ready")
+console.log(uploadsDir)
+console.log("================================")
 
 // -------------------------------------
 // SECURITY CHECKS
@@ -46,29 +46,11 @@ const app =
 if (!process.env.JWT_SECRET) {
 
     console.log("================================")
-
-    console.log(
-        "FATAL ERROR: JWT_SECRET missing"
-    )
-
+    console.log("FATAL ERROR: JWT_SECRET missing")
     console.log("================================")
 
     process.exit(1)
 }
-
-if (!process.env.MONGO_URI) {
-
-    console.log("================================")
-
-    console.log(
-        "FATAL ERROR: MONGO_URI missing"
-    )
-
-    console.log("================================")
-
-    process.exit(1)
-}
-
 // -------------------------------------
 // SECURITY MIDDLEWARE
 // -------------------------------------
@@ -76,29 +58,25 @@ if (!process.env.MONGO_URI) {
 app.use(cors())
 
 app.use(
-
     helmet({
-
-        crossOriginResourcePolicy:
-            false
+        crossOriginResourcePolicy: false
     })
 )
 
-app.use(express.json({
-
-    limit: "10mb"
-}))
+app.use(
+    express.json({
+        limit: "10mb"
+    })
+)
 
 // -------------------------------------
-// GLOBAL RATE LIMITER
+// RATE LIMITER
 // -------------------------------------
 
 app.use(
-
     rateLimit({
 
-        windowMs:
-            15 * 60 * 1000,
+        windowMs: 15 * 60 * 1000,
 
         max: 100,
 
@@ -110,8 +88,7 @@ app.use(
 
             success: false,
 
-            message:
-                "Too many requests"
+            message: "Too many requests"
         }
     })
 )
@@ -126,25 +103,13 @@ app.use((req, res, next) => {
 
     console.log("REQUEST")
 
-    console.log(
-        "METHOD:",
-        req.method
-    )
+    console.log("METHOD:", req.method)
 
-    console.log(
-        "URL:",
-        req.originalUrl
-    )
+    console.log("URL:", req.originalUrl)
 
-    console.log(
-        "IP:",
-        req.ip
-    )
+    console.log("IP:", req.ip)
 
-    console.log(
-        "TIME:",
-        new Date()
-    )
+    console.log("TIME:", new Date())
 
     console.log("================================")
 
@@ -152,25 +117,7 @@ app.use((req, res, next) => {
 })
 
 // -------------------------------------
-// API ROUTES
-// -------------------------------------
-
-app.use(
-
-    "/api",
-
-    formRoutes
-)
-
-app.use(
-
-    "/auth",
-
-    authRoutes
-)
-
-// -------------------------------------
-// HEALTH CHECK
+// ROOT ROUTE
 // -------------------------------------
 
 app.get("/", (req, res) => {
@@ -179,26 +126,50 @@ app.get("/", (req, res) => {
 
         success: true,
 
-        message:
-            "SourceForm Backend Running"
+        message: "SourceForm Cloud Backend Running"
     })
 })
 
 // -------------------------------------
-// UNKNOWN ROUTES
+// HEALTH CHECK
+// -------------------------------------
+
+app.get("/health", (req, res) => {
+
+    res.status(200).json({
+
+        success: true,
+
+        status: "ok",
+
+        service: "SourceForm Backend",
+
+        uptime: process.uptime(),
+
+        timestamp: new Date()
+    })
+})
+
+// -------------------------------------
+// API ROUTES
+// -------------------------------------
+
+app.use("/api", formRoutes)
+
+app.use("/auth", authRoutes)
+
+// -------------------------------------
+// 404 HANDLER
 // -------------------------------------
 
 app.use((req, res) => {
 
-    res.status(404)
+    res.status(404).json({
 
-        .json({
+        success: false,
 
-            success: false,
-
-            message:
-                "Route not found"
-        })
+        message: "Route not found"
+    })
 })
 
 // -------------------------------------
@@ -209,156 +180,66 @@ app.use((err, req, res, next) => {
 
     console.log("================================")
 
-    console.log(
-        "GLOBAL SERVER ERROR"
-    )
+    console.log("GLOBAL SERVER ERROR")
 
     console.log(err)
 
     console.log("================================")
 
-    res.status(500)
+    res.status(500).json({
 
-        .json({
+        success: false,
 
-            success: false,
-
-            message:
-                "Internal Server Error"
-        })
+        message: err.message || "Internal Server Error"
+    })
 })
 
 // -------------------------------------
-// MONGODB CONNECTION
+// PORT
 // -------------------------------------
 
-mongoose.connect(
-
-    process.env.MONGO_URI
-)
-
-.then(() => {
-
-    console.log("================================")
-
-    console.log(
-        "MongoDB Atlas Connected"
-    )
-
-    console.log("================================")
-})
-
-.catch((err) => {
-
-    console.log("================================")
-
-    console.log(
-        "MongoDB Connection Error"
-    )
-
-    console.log(err)
-
-    console.log("================================")
-})
+const PORT = process.env.PORT || 8080
 
 // -------------------------------------
-// SERVER START
+// START SERVER
 // -------------------------------------
 
-const PORT =
+async function startServer() {
 
-    process.env.PORT || 5000
-
-network.get_active_interface(
-
-    (err, obj) => {
-
-        if (err) {
-
-            console.log(
-                "Network Detection Error"
-            )
-
-            console.log(err)
-
-            return
-        }
-
-        const localIP =
-            obj.ip_address
+    try {
 
         app.listen(
-
             PORT,
-
             "0.0.0.0",
-
             () => {
 
-                const backendURL =
+                console.log("================================")
 
-                    `http://${localIP}:${PORT}`
+                console.log("SOURCEFORM CLOUD BACKEND RUNNING")
+
+                console.log("PORT:", PORT)
 
                 console.log("================================")
 
-                console.log(
-                    "SERVER RUNNING"
-                )
-
-                console.log(
-                    "WiFi IP:"
-                )
-
-                console.log(localIP)
+                console.log("Health Endpoint:")
+                console.log("/health")
 
                 console.log("================================")
-
-                console.log(
-                    "Backend URL:"
-                )
-
-                console.log(
-                    backendURL
-                )
-
-                console.log("================================")
-
-                // ---------------------------------
-                // NSD SERVICE
-                // ---------------------------------
-
-                bonjour.publish({
-
-                    name:
-                        "SourceForm Backend",
-
-                    type:
-                        "sourceform",
-
-                    port:
-                        PORT
-                })
-
-                console.log(
-                    "NSD SERVICE PUBLISHED"
-                )
-
-                console.log("================================")
-
-                console.log(
-                    "SCAN QR BELOW"
-                )
-
-                qrcode.generate(
-
-                    backendURL,
-
-                    {
-
-                        small: true
-                    }
-                )
             }
         )
+
+    } catch (err) {
+
+        console.log("================================")
+
+        console.log("SERVER STARTUP ERROR")
+
+        console.log(err)
+
+        console.log("================================")
+
+        process.exit(1)
     }
-)
+}
+
+startServer()

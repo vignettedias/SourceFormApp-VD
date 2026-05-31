@@ -77,9 +77,9 @@ router.post(
 
             const existingUser =
 
-                await User.findOne({
-                    email
-                })
+    await User.findByEmail(
+        email
+    )
 
             if (existingUser) {
 
@@ -123,21 +123,30 @@ router.post(
 
             const newUser =
 
-                new User({
+    await User.create({
 
-                    name,
+        name,
 
-                    email,
+        email,
 
-                    password:
-                        hashedPassword
-                })
+        password:
+            hashedPassword,
 
-            console.log(
-                "SAVING USER"
-            )
+        authProvider:
+            "manual",
 
-            await newUser.save()
+        role:
+            "user",
+
+        failedLoginAttempts:
+            0,
+
+        accountLockedUntil:
+            null,
+
+        createdAt:
+            new Date()
+    })
 
             console.log(
                 "USER SAVED"
@@ -157,7 +166,7 @@ router.post(
 
                     {
                         userId:
-                            newUser._id
+                            newUser.id
                     },
 
                     process.env.JWT_SECRET,
@@ -186,7 +195,7 @@ router.post(
                     user: {
 
                         id:
-                            newUser._id,
+                            newUser.id,
 
                         name:
                             newUser.name,
@@ -259,9 +268,9 @@ router.post(
 
             const user =
 
-                await User.findOne({
-                    email
-                })
+    await User.findByEmail(
+        email
+    )
 
             if (!user) {
 
@@ -304,7 +313,7 @@ router.post(
 
                     {
                         userId:
-                            user._id
+                            user.id
                     },
 
                     process.env.JWT_SECRET,
@@ -325,7 +334,7 @@ router.post(
                     user: {
 
                         id:
-                            user._id,
+                            user.id,
 
                         name:
                             user.name,

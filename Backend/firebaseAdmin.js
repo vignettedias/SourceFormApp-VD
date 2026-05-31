@@ -1,15 +1,6 @@
-const admin =
-    require("firebase-admin")
+const admin = require("firebase-admin");
 
-const serviceAccount =
-    require("./firebase-service-account.json")
+// Uses Cloud Run's attached service account automatically
+admin.initializeApp();
 
-admin.initializeApp({
-
-    credential:
-        admin.credential.cert(
-            serviceAccount
-        )
-})
-
-module.exports = admin
+module.exports = admin;
