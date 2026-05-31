@@ -1,6 +1,7 @@
-const admin = require("firebase-admin");
+const admin = require("firebase-admin")
 
-// Uses Cloud Run's attached service account automatically
-admin.initializeApp();
+admin.initializeApp({
+    storageBucket: "sourceformcloud.firebasestorage.app"
+})
 
-module.exports = admin;
+module.exports = admin

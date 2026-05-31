@@ -20,7 +20,8 @@ const rateLimit =
     require("express-rate-limit")
 const admin =
     require("../firebaseAdmin")
-
+const bucket =
+    admin.storage().bucket()
 const router =
     express.Router()
 
