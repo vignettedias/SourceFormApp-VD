@@ -1,6 +1,23 @@
 const verifyAuth =
     require("../middleware/authMiddleware")
+const {
+    generateSHA256
+} = require("../services/hashService")
 
+const {
+    logSecurityEvent
+} = require("../services/auditService")
+const encryptionService =
+    require("../services/encryptionService")
+
+console.log(
+    "ENCRYPTION SERVICE =",
+    encryptionService
+)
+const {
+    encrypt,
+    decrypt
+} = encryptionService
 const express =
     require("express")
 
@@ -764,6 +781,30 @@ router.post(
                 "================================"
             )
 // ---------------------------------
+// SHA256 INTEGRITY HASH
+// ---------------------------------
+
+const fileBuffer =
+
+    fs.readFileSync(
+        req.file.path
+    )
+
+const fileHash =
+
+    generateSHA256(
+        fileBuffer
+    )
+
+console.log(
+    "SHA256:"
+)
+
+console.log(
+    fileHash
+)
+
+// ---------------------------------
 // FIREBASE STORAGE UPLOAD
 // ---------------------------------
 
@@ -801,21 +842,32 @@ console.log(
     downloadUrl
 )
 
+// ---------------------------------
+// FIRESTORE DOCUMENT
+// ---------------------------------
 console.log(
-    downloadUrl
+    "PHASE5_FERNET_ACTIVE"
 )
- await admin
+
+console.log(
+    encrypt(name)
+)
+await admin
     .firestore()
     .collection("forms")
     .add({
 
-        name,
+        name:
+            encrypt(name),
 
-        email,
+        email:
+            encrypt(email),
 
-        phone,
+        phone:
+            encrypt(phone),
 
-        description,
+        description:
+            encrypt(description),
 
         fileName:
             req.file.originalname,
@@ -825,6 +877,9 @@ console.log(
 
         fileUrl:
             downloadUrl,
+
+        sha256Hash:
+            fileHash,
 
         authEmail:
             req.user.email,
@@ -838,6 +893,35 @@ console.log(
 
 console.log(
     "Firestore document created"
+)
+
+// ---------------------------------
+// SECURITY AUDIT LOG
+// ---------------------------------
+
+await logSecurityEvent(
+
+    "FILE_UPLOAD",
+
+    req.user.email,
+
+    {
+
+        originalFile:
+            req.file.originalname,
+
+        storagePath,
+
+        sha256Hash:
+            fileHash,
+
+        authType:
+            req.user.authType
+    }
+)
+
+console.log(
+    "Security audit log created"
 )
 
 // ---------------------------------
