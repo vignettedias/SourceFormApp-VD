@@ -984,5 +984,144 @@ if (
         }
     }
 )
+// -------------------------------------
+// SECURE FILE DOWNLOAD
+// -------------------------------------
 
+router.get(
+
+    "/download/:id",
+
+    verifyAuth,
+
+    async (
+        req,
+        res
+    ) => {
+
+        try {
+
+            const docId =
+                req.params.id
+
+            const document =
+
+                await admin
+                    .firestore()
+                    .collection("forms")
+                    .doc(docId)
+                    .get()
+
+            if (
+                !document.exists
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Document not found"
+                    })
+            }
+
+            const data =
+                document.data()
+
+            const storagePath =
+                data.storagePath
+
+            const file =
+                bucket.file(
+                    storagePath
+                )
+
+            const [exists] =
+                await file.exists()
+
+            if (!exists) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "File missing from storage"
+                    })
+            }
+
+            const [signedUrl] =
+                await file.getSignedUrl({
+
+                    action:
+                        "read",
+
+                    expires:
+                        Date.now()
+                        +
+                        15 * 60 * 1000
+                })
+
+            await logSecurityEvent(
+
+                "FILE_DOWNLOAD",
+
+                req.user.email,
+
+                {
+
+                    documentId:
+                        docId,
+
+                    storagePath:
+                        storagePath,
+
+                    authType:
+                        req.user.authType
+                }
+            )
+
+            return res
+                .status(200)
+                .json({
+
+                    success: true,
+
+                    fileName:
+                        data.fileName
+                            ? decrypt(
+                                data.fileName
+                            )
+                            : "document",
+
+                    downloadUrl:
+                        signedUrl
+                })
+
+        } catch (err) {
+
+            console.log(
+                "DOWNLOAD ERROR"
+            )
+
+            console.log(
+                err
+            )
+
+            return res
+                .status(500)
+                .json({
+
+                    success: false,
+
+                    message:
+                        "Download failed"
+                })
+        }
+    }
+)
 module.exports = router
