@@ -870,7 +870,7 @@ await admin
             encrypt(description),
 
         fileName:
-            req.file.originalname,
+            encrypt(req.file.originalname),
 
         storagePath:
             storagePath,
