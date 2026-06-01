@@ -21,7 +21,11 @@ const rateLimit =
 const admin =
     require("../firebaseAdmin")
 const bucket =
-    admin.storage().bucket()
+    admin.storage().bucket(
+        "sourceformcloud.firebasestorage.app"
+    )
+console.log("Firebase Storage Bucket:")
+console.log(bucket.name)
 const router =
     express.Router()
 
@@ -759,7 +763,47 @@ router.post(
             console.log(
                 "================================"
             )
+// ---------------------------------
+// FIREBASE STORAGE UPLOAD
+// ---------------------------------
 
+const storagePath =
+
+    `uploads/${req.file.filename}`
+
+await bucket.upload(
+
+    req.file.path,
+
+    {
+        destination:
+            storagePath
+    }
+)
+
+const storageFile =
+    bucket.file(
+        storagePath
+    )
+
+const downloadUrl =
+    `https://storage.googleapis.com/${bucket.name}/${storagePath}`
+
+console.log(
+    "Firebase Storage Upload Successful"
+)
+
+console.log(
+    "Download URL:"
+)
+
+console.log(
+    downloadUrl
+)
+
+console.log(
+    downloadUrl
+)
  await admin
     .firestore()
     .collection("forms")
@@ -774,7 +818,13 @@ router.post(
         description,
 
         fileName:
-            req.file.filename,
+            req.file.originalname,
+
+        storagePath:
+            storagePath,
+
+        fileUrl:
+            downloadUrl,
 
         authEmail:
             req.user.email,
@@ -789,6 +839,25 @@ router.post(
 console.log(
     "Firestore document created"
 )
+
+// ---------------------------------
+// DELETE TEMP FILE
+// ---------------------------------
+
+if (
+    fs.existsSync(
+        req.file.path
+    )
+) {
+
+    fs.unlinkSync(
+        req.file.path
+    )
+
+    console.log(
+        "Temporary file deleted"
+    )
+}
             // ---------------------------------
             // SUCCESS
             // ---------------------------------

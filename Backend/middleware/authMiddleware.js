@@ -50,7 +50,7 @@ async function verifyAuth(
             )[1]
 
         // ---------------------------------
-        // TRY JWT TOKEN FIRST
+        // TRY MANUAL JWT FIRST
         // ---------------------------------
 
         try {
@@ -86,7 +86,7 @@ async function verifyAuth(
             req.user = {
 
                 id:
-                    user._id,
+                    user.id,
 
                 email:
                     user.email,
@@ -107,7 +107,13 @@ async function verifyAuth(
 
         } catch (jwtError) {
 
-            // Continue to Firebase verification
+            console.log(
+                "JWT verification failed."
+            )
+
+            console.log(
+                "Trying Firebase token..."
+            )
         }
 
         // ---------------------------------
@@ -118,7 +124,8 @@ async function verifyAuth(
 
             const decodedFirebase =
 
-                await admin.auth()
+                await admin
+                    .auth()
                     .verifyIdToken(
                         token
                     )
@@ -147,6 +154,14 @@ async function verifyAuth(
 
         } catch (firebaseError) {
 
+            console.log(
+                "FIREBASE TOKEN ERROR"
+            )
+
+            console.log(
+                firebaseError
+            )
+
             return res
                 .status(401)
                 .json({
@@ -164,7 +179,9 @@ async function verifyAuth(
             "AUTH MIDDLEWARE ERROR"
         )
 
-        console.log(err)
+        console.log(
+            err
+        )
 
         return res
             .status(500)
