@@ -987,17 +987,10 @@ if (
 // -------------------------------------
 // SECURE FILE DOWNLOAD
 // -------------------------------------
-
 router.get(
-
     "/download/:id",
-
     verifyAuth,
-
-    async (
-        req,
-        res
-    ) => {
+    async (req, res) => {
 
         try {
 
@@ -1005,37 +998,26 @@ router.get(
                 req.params.id
 
             const document =
-
                 await admin
                     .firestore()
                     .collection("forms")
                     .doc(docId)
                     .get()
 
-            if (
-                !document.exists
-            ) {
+            if (!document.exists) {
 
-                return res
-                    .status(404)
-                    .json({
-
-                        success: false,
-
-                        message:
-                            "Document not found"
-                    })
+                return res.status(404).json({
+                    success: false,
+                    message: "Document not found"
+                })
             }
 
             const data =
                 document.data()
 
-            const storagePath =
-                data.storagePath
-
             const file =
                 bucket.file(
-                    storagePath
+                    data.storagePath
                 )
 
             const [exists] =
@@ -1043,27 +1025,33 @@ router.get(
 
             if (!exists) {
 
-                return res
-                    .status(404)
-                    .json({
-
-                        success: false,
-
-                        message:
-                            "File missing from storage"
-                    })
+                return res.status(404).json({
+                    success: false,
+                    message: "File missing from storage"
+                })
             }
 
-            const [signedUrl] =
+            // Integrity verification
+            const [buffer] =
+                await file.download()
+
+            const calculatedHash =
+                generateSHA256(buffer)
+
+            const integrityStatus =
+                calculatedHash === data.sha256Hash
+                    ? "VALID"
+                    : "TAMPERED"
+
+            const [downloadUrl] =
                 await file.getSignedUrl({
 
-                    action:
-                        "read",
+                    action: "read",
 
                     expires:
                         Date.now()
                         +
-                        15 * 60 * 1000
+                        (15 * 60 * 1000)
                 })
 
             await logSecurityEvent(
@@ -1077,50 +1065,99 @@ router.get(
                     documentId:
                         docId,
 
-                    storagePath:
-                        storagePath,
+                    integrity:
+                        integrityStatus,
 
-                    authType:
-                        req.user.authType
+                    storagePath:
+                        data.storagePath
                 }
             )
 
-            return res
-                .status(200)
-                .json({
+            return res.status(200).json({
 
-                    success: true,
+                success: true,
 
-                    fileName:
+                integrity:
+                    integrityStatus,
+
+                fileName:
+                    decrypt(
                         data.fileName
-                            ? decrypt(
-                                data.fileName
-                            )
-                            : "document",
+                    ),
 
-                    downloadUrl:
-                        signedUrl
-                })
+                downloadUrl
+            })
 
-        } catch (err) {
+        } catch (error) {
 
             console.log(
                 "DOWNLOAD ERROR"
             )
 
             console.log(
-                err
+                error
             )
 
-            return res
-                .status(500)
-                .json({
+            return res.status(500).json({
 
+                success: false,
+
+                message:
+                    "Download failed"
+            })
+        }
+    }
+)
+router.get(
+    "/test-decrypt/:id",
+    async (req, res) => {
+
+        try {
+
+            const doc =
+                await admin
+                    .firestore()
+                    .collection("forms")
+                    .doc(req.params.id)
+                    .get()
+
+            if (!doc.exists) {
+
+                return res.status(404).json({
                     success: false,
-
-                    message:
-                        "Download failed"
+                    message: "Document not found"
                 })
+            }
+
+            const data = doc.data()
+
+            return res.json({
+
+                name:
+                    decrypt(data.name),
+
+                email:
+                    decrypt(data.email),
+
+                phone:
+                    decrypt(data.phone),
+
+                description:
+                    decrypt(data.description),
+
+                fileName:
+                    decrypt(data.fileName)
+            })
+
+        } catch (err) {
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Decrypt failed"
+            })
         }
     }
 )
