@@ -876,7 +876,7 @@ await admin
             storagePath,
 
         fileUrl:
-            downloadUrl,
+            null,
 
         sha256Hash:
             fileHash,
@@ -1054,24 +1054,31 @@ router.get(
                         (15 * 60 * 1000)
                 })
 
-            await logSecurityEvent(
+            const userEmail =
+    req.user?.email
+    ||
+    data.authEmail
+    ||
+    "TEST_USER"
 
-                "FILE_DOWNLOAD",
+await logSecurityEvent(
 
-                req.user.email,
+    "FILE_DOWNLOAD",
 
-                {
+    userEmail,
 
-                    documentId:
-                        docId,
+    {
 
-                    integrity:
-                        integrityStatus,
+        documentId:
+            docId,
 
-                    storagePath:
-                        data.storagePath
-                }
-            )
+        integrity:
+            integrityStatus,
+
+        storagePath:
+            data.storagePath
+    }
+)
 
             return res.status(200).json({
 
@@ -1095,8 +1102,20 @@ router.get(
             )
 
             console.log(
-                error
-            )
+    "DOWNLOAD ERROR MESSAGE:"
+)
+
+console.log(
+    error.message
+)
+
+console.log(
+    "DOWNLOAD ERROR STACK:"
+)
+
+console.log(
+    error.stack
+)
 
             return res.status(500).json({
 
@@ -1110,6 +1129,7 @@ router.get(
 )
 router.get(
     "/test-decrypt/:id",
+    verifyAuth,
     async (req, res) => {
 
         try {
