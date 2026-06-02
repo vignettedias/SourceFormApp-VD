@@ -1,16 +1,14 @@
 package com.example.sourceformapp
-import kotlinx.coroutines.tasks.await
+
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -22,88 +20,76 @@ import androidx.appcompat.app.AppCompatActivity
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
+import java.util.UUID
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+class MainActivityFirebase : AppCompatActivity() {
 
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-
-import java.io.File
-import java.io.FileOutputStream
-
-class MainActivity : AppCompatActivity() {
+    // -----------------------------------------
+    // INPUTS
+    // -----------------------------------------
 
     private lateinit var etName: EditText
     private lateinit var etEmail: EditText
     private lateinit var etPhone: EditText
     private lateinit var etDescription: EditText
 
+    // -----------------------------------------
+    // STATUS TEXT
+    // -----------------------------------------
+
     private lateinit var tvFileName: TextView
     private lateinit var tvWordCount: TextView
     private lateinit var tvEmailStatus: TextView
     private lateinit var tvPhoneStatus: TextView
 
+    private lateinit var tvConnectionStatus: TextView
+
+    private lateinit var tvUserEmail: TextView
+    private lateinit var tvAuthProvider: TextView
+
+    // -----------------------------------------
+    // BUTTONS
+    // -----------------------------------------
+
     private lateinit var btnSubmit: Button
     private lateinit var btnLogout: Button
+
+    // -----------------------------------------
+    // UI
+    // -----------------------------------------
 
     private lateinit var progressBar: ProgressBar
 
     private lateinit var successCard: View
 
-    private lateinit var tvConnectionStatus: TextView
     private lateinit var statusDot: View
+
+    // -----------------------------------------
+    // FILE
+    // -----------------------------------------
 
     private var selectedFileUri: Uri? = null
 
-    private var backendURL = ""
-
-    private val isEmulator: Boolean by lazy {
-
-        Build.FINGERPRINT.contains("generic")
-                ||
-                Build.MODEL.contains("Emulator")
-    }
-
     // -----------------------------------------
-    // QR Scanner
+    // FIREBASE
     // -----------------------------------------
 
-    private val qrLauncher =
-        registerForActivityResult(
-            ScanContract()
-        ) { result ->
+    private val auth =
+        FirebaseAuth.getInstance()
 
-            if (result.contents != null) {
+    private val storage =
+        FirebaseStorage.getInstance()
 
-                backendURL =
-                    result.contents
-                        .trim()
-                        .removeSuffix("/") + "/"
-
-                RetrofitClient.setBaseUrl(
-                    backendURL
-                )
-
-                updateConnectionStatus(true)
-
-                Toast.makeText(
-                    this,
-                    "Backend Connected",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
+    private val firestore =
+        FirebaseFirestore.getInstance()
 
     // -----------------------------------------
-    // File Picker
+    // FILE PICKER
     // -----------------------------------------
 
     private val filePicker =
@@ -121,18 +107,15 @@ class MainActivity : AppCompatActivity() {
                 validateFields()
             }
         }
-
-    // -----------------------------------------
-    // onCreate
-    // -----------------------------------------
-
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
 
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(
+            R.layout.activity_main
+        )
 
         initializeViews()
 
@@ -140,31 +123,15 @@ class MainActivity : AppCompatActivity() {
 
         setupValidation()
 
-        setupFocusEffects()
-
-        backendURL =
-
-            if (isEmulator) {
-
-                "http://10.0.2.2:5000/"
-
-            } else {
-
-                "http://172.22.8.136:5000/"
-            }
-
-        RetrofitClient.setBaseUrl(
-            backendURL
-        )
+        loadUserInformation()
 
         updateConnectionStatus(true)
 
         validateFields()
     }
-
     // -----------------------------------------
-    // Initialize Views
-    // -----------------------------------------
+// INITIALIZE VIEWS
+// -----------------------------------------
 
     private fun initializeViews() {
 
@@ -192,6 +159,15 @@ class MainActivity : AppCompatActivity() {
         tvPhoneStatus =
             findViewById(R.id.tvPhoneStatus)
 
+        tvConnectionStatus =
+            findViewById(R.id.tvConnectionStatus)
+
+        tvUserEmail =
+            findViewById(R.id.tvUserEmail)
+
+        tvAuthProvider =
+            findViewById(R.id.tvAuthProvider)
+
         btnSubmit =
             findViewById(R.id.btnSubmit)
 
@@ -204,16 +180,12 @@ class MainActivity : AppCompatActivity() {
         successCard =
             findViewById(R.id.successCard)
 
-        tvConnectionStatus =
-            findViewById(R.id.tvConnectionStatus)
-
         statusDot =
             findViewById(R.id.statusDot)
     }
-
     // -----------------------------------------
-    // Initialize Buttons
-    // -----------------------------------------
+// INITIALIZE BUTTONS
+// -----------------------------------------
 
     private fun initializeButtons() {
 
@@ -222,19 +194,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.btnChooseFile
             )
 
-        val btnScanQR =
-            findViewById<Button>(
-                R.id.btnScanQR
-            )
-
         btnChooseFile.setOnClickListener {
 
             filePicker.launch("*/*")
-        }
-
-        btnScanQR.setOnClickListener {
-
-            openQRScanner()
         }
 
         btnSubmit.setOnClickListener {
@@ -244,13 +206,12 @@ class MainActivity : AppCompatActivity() {
 
         btnLogout.setOnClickListener {
 
-            FirebaseAuth
-                .getInstance()
-                .signOut()
+            auth.signOut()
 
             GoogleSignIn
                 .getClient(
                     this,
+
                     GoogleSignInOptions.Builder(
                         GoogleSignInOptions.DEFAULT_SIGN_IN
                     ).build()
@@ -268,59 +229,79 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
     }
-
     // -----------------------------------------
-    // Focus Effects
-    // -----------------------------------------
+// USER INFORMATION
+// -----------------------------------------
 
-    private fun setupFocusEffects() {
+    private fun loadUserInformation() {
 
-        val fields = listOf(
+        val user =
+            auth.currentUser
 
-            etName,
-            etEmail,
-            etPhone,
-            etDescription
-        )
+        tvUserEmail.text =
+            user?.email
+                ?: "Unknown User"
 
-        fields.forEach { field ->
+        val provider =
 
-            field.setOnFocusChangeListener {
+            user?.providerData
+                ?.lastOrNull()
+                ?.providerId
 
-                    view,
-                    hasFocus ->
+        tvAuthProvider.text =
 
-                if (hasFocus) {
+            when (provider) {
 
-                    view.setBackgroundResource(
-                        R.drawable.edittext_focused
-                    )
+                "google.com" ->
+                    "Google"
 
-                    view.animate()
-                        .scaleX(1.02f)
-                        .scaleY(1.02f)
-                        .setDuration(120)
-                        .start()
+                "github.com" ->
+                    "GitHub"
 
-                } else {
+                "facebook.com" ->
+                    "Facebook"
 
-                    view.setBackgroundResource(
-                        R.drawable.edittext_bg
-                    )
+                "password" ->
+                    "Email / Password"
 
-                    view.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(120)
-                        .start()
-                }
+                else ->
+                    "Firebase"
             }
+    }
+    // -----------------------------------------
+// CONNECTION STATUS
+// -----------------------------------------
+
+    private fun updateConnectionStatus(
+        connected: Boolean
+    ) {
+
+        if (connected) {
+
+            tvConnectionStatus.text =
+                " Cloud Connected"
+
+            statusDot.backgroundTintList =
+
+                ColorStateList.valueOf(
+                    Color.parseColor("#22C55E")
+                )
+
+        } else {
+
+            tvConnectionStatus.text =
+                " Cloud Offline"
+
+            statusDot.backgroundTintList =
+
+                ColorStateList.valueOf(
+                    Color.RED
+                )
         }
     }
-
     // -----------------------------------------
-    // Validation Logic
-    // -----------------------------------------
+// VALIDATION
+// -----------------------------------------
 
     private fun setupValidation() {
 
@@ -358,7 +339,7 @@ class MainActivity : AppCompatActivity() {
                     } else if (valid) {
 
                         tvEmailStatus.text =
-                            "Valid Email"
+                            "✓ Valid Email Address"
 
                         tvEmailStatus.setTextColor(
                             Color.parseColor("#22C55E")
@@ -367,7 +348,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
 
                         tvEmailStatus.text =
-                            "Invalid Email"
+                            "✗ Invalid Email Address"
 
                         tvEmailStatus.setTextColor(
                             Color.RED
@@ -411,12 +392,14 @@ class MainActivity : AppCompatActivity() {
 
                         phone.length == 10
                         &&
-                        phone.all { it.isDigit() }
+                        phone.all {
+                            it.isDigit()
+                        }
 
                     ) {
 
                         tvPhoneStatus.text =
-                            "Valid Phone Number"
+                            "✓ Valid Mobile Number"
 
                         tvPhoneStatus.setTextColor(
                             Color.parseColor("#22C55E")
@@ -425,7 +408,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
 
                         tvPhoneStatus.text =
-                            "Phone must contain 10 digits"
+                            "✗ Must contain 10 digits"
 
                         tvPhoneStatus.setTextColor(
                             Color.RED
@@ -469,7 +452,7 @@ class MainActivity : AppCompatActivity() {
                             .size
 
                     tvWordCount.text =
-                        "$words / 140 words"
+                        "Description Length: $words / 140 words"
 
                     if (words > 140) {
 
@@ -480,7 +463,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
 
                         tvWordCount.setTextColor(
-                            Color.parseColor("#B3B3B3")
+                            Color.parseColor("#9CA3AF")
                         )
                     }
 
@@ -493,10 +476,9 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
-
     // -----------------------------------------
-    // Validate Fields
-    // -----------------------------------------
+// FORM VALIDATION
+// -----------------------------------------
 
     private fun validateFields() {
 
@@ -534,7 +516,9 @@ class MainActivity : AppCompatActivity() {
                     &&
                     phone.length == 10
                     &&
-                    phone.all { it.isDigit() }
+                    phone.all {
+                        it.isDigit()
+                    }
                     &&
                     words <= 140
                     &&
@@ -545,265 +529,186 @@ class MainActivity : AppCompatActivity() {
         btnSubmit.alpha =
             if (valid) 1f else 0.5f
     }
-
     // -----------------------------------------
-    // Connection Status
-    // -----------------------------------------
+// FIREBASE UPLOAD
+// -----------------------------------------
 
-    private fun updateConnectionStatus(
-        connected: Boolean
-    ) {
-
-        if (connected) {
-
-            tvConnectionStatus.text =
-                " Backend Connected"
-
-            statusDot.backgroundTintList =
-
-                ColorStateList.valueOf(
-                    Color.parseColor("#22C55E")
-                )
-
-        } else {
-
-            tvConnectionStatus.text =
-                " Backend Offline"
-
-            statusDot.backgroundTintList =
-
-                ColorStateList.valueOf(
-                    Color.RED
-                )
-        }
-    }
-
-    // -----------------------------------------
-    // Upload Logic
-    // -----------------------------------------
     private fun validateAndUpload() {
+
+        val fileUri =
+            selectedFileUri ?: return
 
         successCard.visibility =
             View.GONE
 
-        btnSubmit.isEnabled = false
+        progressBar.visibility =
+            View.VISIBLE
+
+        btnSubmit.isEnabled =
+            false
 
         btnSubmit.text =
             "Uploading..."
 
-        progressBar.visibility =
-            View.VISIBLE
+        val fileName =
 
-        CoroutineScope(Dispatchers.IO)
-            .launch {
+            UUID.randomUUID()
+                .toString() +
 
-                try {
+                    "_" +
 
-                    // ---------------------------------
-                    // GET FIREBASE TOKEN
-                    // ---------------------------------
+                    queryFileName(fileUri)
 
-                    val firebaseUser =
+        val storageRef =
 
-                        FirebaseAuth
-                            .getInstance()
-                            .currentUser
+            storage.reference
+                .child(
+                    "documents/$fileName"
+                )
 
-                    if (firebaseUser == null) {
+        storageRef.putFile(fileUri)
 
-                        runOnUiThread {
+            .addOnSuccessListener {
 
-                            progressBar.visibility =
-                                View.GONE
+                storageRef.downloadUrl
 
-                            btnSubmit.isEnabled =
-                                true
+                    .addOnSuccessListener {
 
-                            btnSubmit.text =
-                                "Submit Form"
+                            downloadUrl ->
 
-                            Toast.makeText(
-                                this@MainActivity,
-                                "User not authenticated",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                        val uploadData =
 
-                        return@launch
-                    }
+                            hashMapOf(
 
-                    val tokenResult =
+                                "name" to
+                                        etName.text
+                                            .toString(),
 
-                        firebaseUser
-                            .getIdToken(false)
-                            .await()
+                                "email" to
+                                        etEmail.text
+                                            .toString(),
 
-                    val firebaseToken =
-                        tokenResult.token
+                                "phone" to
+                                        etPhone.text
+                                            .toString(),
 
-                    if (firebaseToken == null) {
+                                "description" to
+                                        etDescription.text
+                                            .toString(),
 
-                        runOnUiThread {
+                                "fileUrl" to
+                                        downloadUrl.toString(),
 
-                            progressBar.visibility =
-                                View.GONE
+                                "fileName" to
+                                        fileName,
 
-                            btnSubmit.isEnabled =
-                                true
+                                "uploadedBy" to
+                                        auth.currentUser?.uid,
 
-                            btnSubmit.text =
-                                "Submit Form"
+                                "uploadedEmail" to
+                                        auth.currentUser?.email,
 
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Failed to get auth token",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                                "timestamp" to
+                                        System.currentTimeMillis(),
 
-                        return@launch
-                    }
-
-                    // ---------------------------------
-                    // FILE
-                    // ---------------------------------
-
-                    val file =
-                        uriToFile(selectedFileUri!!)
-
-                    val requestFile =
-                        file.asRequestBody(
-                            "*/*"
-                                .toMediaTypeOrNull()
-                        )
-
-                    val multipart =
-                        MultipartBody.Part
-                            .createFormData(
-                                "file",
-                                file.name,
-                                requestFile
+                                "status" to
+                                        "secured"
                             )
 
-                    // ---------------------------------
-                    // API REQUEST
-                    // ---------------------------------
+                        firestore
 
-                    val response =
-
-                        RetrofitClient
-                            .getClient()
-                            .uploadForm(
-
-                                "Bearer $firebaseToken",
-
-                                etName.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
-
-                                etEmail.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
-
-                                etPhone.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
-
-                                etDescription.text.toString()
-                                    .toRequestBody(
-                                        "text/plain"
-                                            .toMediaTypeOrNull()
-                                    ),
-
-                                multipart
+                            .collection(
+                                "uploads"
                             )
 
-                    runOnUiThread {
+                            .add(
+                                uploadData
+                            )
 
-                        progressBar.visibility =
-                            View.GONE
+                            .addOnSuccessListener {
 
-                        btnSubmit.isEnabled =
-                            true
+                                progressBar.visibility =
+                                    View.GONE
 
-                        btnSubmit.text =
-                            "Submit Form"
+                                btnSubmit.isEnabled =
+                                    true
 
-                        if (response.isSuccessful) {
+                                btnSubmit.text =
+                                    "Submit Form"
 
-                            updateConnectionStatus(true)
+                                successCard.visibility =
+                                    View.VISIBLE
 
-                            successCard.visibility =
-                                View.VISIBLE
-
-                            val animation =
-
-                                AnimationUtils.loadAnimation(
-                                    this@MainActivity,
-                                    R.anim.success_popup
+                                updateConnectionStatus(
+                                    true
                                 )
 
-                            successCard.startAnimation(
-                                animation
-                            )
+                                Toast.makeText(
 
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Upload Successful",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                                    this,
 
-                            clearForm()
+                                    "Secure Upload Successful",
 
-                        } else {
+                                    Toast.LENGTH_LONG
 
-                            updateConnectionStatus(false)
+                                ).show()
 
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Upload Failed",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                                clearForm()
+                            }
 
-                        validateFields()
+                            .addOnFailureListener {
+
+                                progressBar.visibility =
+                                    View.GONE
+
+                                btnSubmit.isEnabled =
+                                    true
+
+                                btnSubmit.text =
+                                    "Submit Form"
+
+                                Toast.makeText(
+
+                                    this,
+
+                                    "Metadata Save Failed",
+
+                                    Toast.LENGTH_LONG
+
+                                ).show()
+                            }
                     }
+            }
 
-                } catch (e: Exception) {
+            .addOnFailureListener {
 
-                    runOnUiThread {
+                progressBar.visibility =
+                    View.GONE
 
-                        updateConnectionStatus(false)
+                btnSubmit.isEnabled =
+                    true
 
-                        progressBar.visibility =
-                            View.GONE
+                btnSubmit.text =
+                    "Submit Form"
 
-                        btnSubmit.isEnabled =
-                            true
+                updateConnectionStatus(
+                    false
+                )
 
-                        btnSubmit.text =
-                            "Submit Form"
+                Toast.makeText(
 
-                        Toast.makeText(
-                            this@MainActivity,
-                            e.message,
-                            Toast.LENGTH_LONG
-                        ).show()
+                    this,
 
-                        validateFields()
-                    }
-                }
+                    "File Upload Failed",
+
+                    Toast.LENGTH_LONG
+
+                ).show()
             }
     }
     // -----------------------------------------
-    // Clear Form
-    // -----------------------------------------
+// CLEAR FORM
+// -----------------------------------------
 
     private fun clearForm() {
 
@@ -815,50 +720,60 @@ class MainActivity : AppCompatActivity() {
 
         etDescription.text.clear()
 
-        tvFileName.text =
-            "No file selected"
-
         tvEmailStatus.text = ""
 
         tvPhoneStatus.text = ""
 
         tvWordCount.text =
-            "0 / 140 words"
+            "Description Length: 0 / 140 words"
+
+        tvFileName.text =
+            "📄 No Secure Document Selected"
 
         selectedFileUri = null
-    }
 
+        validateFields()
+    }
     // -----------------------------------------
-    // Query Filename
-    // -----------------------------------------
+// FILE NAME
+// -----------------------------------------
 
     private fun queryFileName(
         uri: Uri
     ): String {
 
         var name =
-            "unknown_file"
+            "document"
 
         val cursor =
+
             contentResolver.query(
+
                 uri,
+
                 null,
+
                 null,
+
                 null,
+
                 null
             )
 
         cursor?.use {
 
             val index =
+
                 it.getColumnIndex(
                     OpenableColumns.DISPLAY_NAME
                 )
 
             if (
+
                 it.moveToFirst()
                 &&
                 index != -1
+
             ) {
 
                 name =
@@ -867,35 +782,5 @@ class MainActivity : AppCompatActivity() {
         }
 
         return name
-    }
-
-    // -----------------------------------------
-    // URI → File
-    // -----------------------------------------
-
-    private fun uriToFile(
-        uri: Uri
-    ): File {
-
-        val file =
-            File(
-                cacheDir,
-                queryFileName(uri)
-            )
-
-        val input =
-            contentResolver
-                .openInputStream(uri)
-
-        val output =
-            FileOutputStream(file)
-
-        input!!.copyTo(output)
-
-        input.close()
-
-        output.close()
-
-        return file
     }
 }

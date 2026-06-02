@@ -1,197 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
 
-    android:orientation="vertical"
+    android:background="#0B0B0F"
 
-    android:gravity="center"
+    android:fillViewport="true">
 
-    android:background="#121212"
-
-    android:padding="24dp">
-
-    <!-- - -->
-    <!-- Logo / Branding -->
-    <!-- - -->
-
-    <TextView
-
-        android:layout_width="wrap_content"
-
-        android:layout_height="wrap_content"
-
-        android:text="SourceForm"
-
-        android:textColor="#FFFFFF"
-
-        android:textStyle="bold"
-
-        android:textSize="38sp"
-
-        android:letterSpacing="0.03"
-
-        android:layout_marginBottom="10dp"/>
-
-    <TextView
-
-        android:layout_width="wrap_content"
-
-        android:layout_height="wrap_content"
-
-        android:text="Secure Cloud Intake System"
-
-        android:textColor="#B3B3B3"
-
-        android:textSize="15sp"
-
-        android:layout_marginBottom="42dp"/>
-
-    <!-- - -->
-    <!-- Auth Card -->
-    <!-- - -->
-
-    <androidx.cardview.widget.CardView
+    <LinearLayout
 
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
 
-        app:cardCornerRadius="26dp"
+        android:orientation="vertical"
 
-        app:cardElevation="12dp"
+        android:padding="24dp"
 
-        app:cardBackgroundColor="#1E1E1E">
+        android:gravity="center_horizontal">
 
-        <LinearLayout
+        <!-- APP TITLE -->
 
-            android:layout_width="match_parent"
-
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:orientation="vertical"
+            android:text="SourceForm"
 
-            android:padding="24dp">
+            android:textColor="#FFFFFF"
 
-            <!-- Welcome -->
+            android:textStyle="bold"
 
-            <TextView
+            android:textSize="38sp"
 
-                android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Secure Cloud Intake System"
+
+            android:textColor="#9CA3AF"
+
+            android:textSize="15sp"
+
+            android:layout_marginTop="6dp"/>
+
+        <!-- SECURITY BADGE -->
+
+        <TextView
+            android:id="@+id/tvSecurityBadge"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="🔒 Enterprise Security Enabled"
+
+            android:textColor="#22C55E"
+
+            android:textStyle="bold"
+
+            android:textSize="14sp"
+
+            android:layout_marginTop="18dp"/>
+
+        <!-- SECURITY FEATURES CARD -->
+
+        <androidx.cardview.widget.CardView
+
+            android:id="@+id/cardSecurityFeatures"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="20dp"
+
+            app:cardCornerRadius="24dp"
+
+            app:cardElevation="12dp"
+
+            app:cardBackgroundColor="#161B22">
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:text="Welcome Back"
+                android:orientation="vertical"
 
-                android:textColor="#FFFFFF"
+                android:padding="20dp">
 
-                android:textSize="26sp"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:textStyle="bold"
+                    android:text="Security Features"
 
-                android:layout_marginBottom="8dp"/>
+                    android:textColor="#FFFFFF"
 
-            <TextView
+                    android:textStyle="bold"
 
-                android:layout_width="wrap_content"
+                    android:textSize="20sp"
 
-                android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"/>
 
-                android:text="Authenticate to continue"
+                <TextView
+                    android:id="@+id/tvFeatureAuth"
 
-                android:textColor="#B3B3B3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:textSize="14sp"
+                    android:text="✓ Firebase Authentication"
 
-                android:layout_marginBottom="30dp"/>
+                    android:textColor="#22C55E"
 
-            <!-- Google -->
+                    android:textSize="14sp"/>
 
-            <Button
+                <TextView
+                    android:id="@+id/tvFeatureEncrypt"
 
-                android:id="@+id/btnGoogle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:layout_width="match_parent"
+                    android:text="✓ Metadata Encryption"
 
-                android:layout_height="58dp"
+                    android:textColor="#22C55E"
 
-                android:text="Continue with Google"
+                    android:textSize="14sp"
 
-                android:textStyle="bold"
+                    android:layout_marginTop="10dp"/>
 
-                android:textColor="#FFFFFF"
+                <TextView
+                    android:id="@+id/tvFeatureHash"
 
-                android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:backgroundTint="#B794F4"/>
+                    android:text="✓ SHA-256 Integrity Verification"
 
-            <!-- GitHub -->
+                    android:textColor="#22C55E"
 
-            <Button
+                    android:textSize="14sp"
 
-                android:id="@+id/btnGithub"
+                    android:layout_marginTop="10dp"/>
 
-                android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tvFeatureStorage"
 
-                android:layout_height="58dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-                android:layout_marginTop="18dp"
+                    android:text="✓ Protected Cloud Storage"
 
-                android:text="Continue with GitHub"
+                    android:textColor="#22C55E"
 
-                android:textStyle="bold"
+                    android:textSize="14sp"
 
-                android:textColor="#FFFFFF"
+                    android:layout_marginTop="10dp"/>
 
-                android:textSize="16sp"
+                <TextView
+                    android:id="@+id/tvFeatureAudit"
 
-                android:backgroundTint="#374151"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
 
-            <!-- Facebook -->
+                    android:text="✓ Security Audit Logging"
 
-            <Button
+                    android:textColor="#22C55E"
 
-                android:id="@+id/btnFacebook"
+                    android:textSize="14sp"
 
-                android:layout_width="match_parent"
+                    android:layout_marginTop="10dp"/>
 
-                android:layout_height="58dp"
+            </LinearLayout>
 
-                android:layout_marginTop="18dp"
+        </androidx.cardview.widget.CardView>
 
-                android:text="Continue with Facebook"
+        <!-- AUTH SECTION -->
 
-                android:textStyle="bold"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-                android:textColor="#FFFFFF"
+            android:text="Authentication"
 
-                android:textSize="16sp"
+            android:textColor="#FFFFFF"
 
-                android:backgroundTint="#2563EB"/>
+            android:textStyle="bold"
 
-        </LinearLayout>
+            android:textSize="20sp"
 
-    </androidx.cardview.widget.CardView>
+            android:layout_marginTop="28dp"
 
-    <!-- Footer -->
+            android:layout_marginBottom="18dp"/>
 
-    <TextView
+        <!-- GOOGLE -->
 
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnGoogle"
 
-        android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
 
-        android:text="Distributed Mobile Intake Platform"
+            android:text="Continue with Google"
 
-        android:textColor="#6B7280"
+            android:textColor="#FFFFFF"
 
-        android:textSize="13sp"
+            android:textStyle="bold"
 
-        android:layout_marginTop="30dp"/>
-</LinearLayout>
+            android:textAllCaps="false"
+
+            android:backgroundTint="#22C55E"/>
+
+        <!-- GITHUB -->
+
+        <Button
+            android:id="@+id/btnGithub"
+
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+
+            android:layout_marginTop="14dp"
+
+            android:text="Continue with GitHub"
+
+            android:textColor="#FFFFFF"
+
+            android:textStyle="bold"
+
+            android:textAllCaps="false"
+
+            android:backgroundTint="#374151"/>
+
+        <!-- FACEBOOK -->
+
+        <Button
+            android:id="@+id/btnFacebook"
+
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+
+            android:layout_marginTop="14dp"
+
+            android:text="Continue with Facebook"
+
+            android:textColor="#FFFFFF"
+
+            android:textStyle="bold"
+
+            android:textAllCaps="false"
+
+            android:backgroundTint="#2563EB"/>
+
+        <!-- FOOTER -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Distributed Mobile Intake Platform"
+
+            android:textColor="#9CA3AF"
+
+            android:textStyle="bold"
+
+            android:textSize="13sp"
+
+            android:layout_marginTop="36dp"/>
+
+        <TextView
+            android:id="@+id/tvFooterDescription"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="All user information is protected through encryption, integrity verification and secure cloud storage."
+
+            android:textAlignment="center"
+
+            android:textColor="#9CA3AF"
+
+            android:textSize="12sp"
+
+            android:layout_marginTop="10dp"
+
+            android:layout_marginBottom="30dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

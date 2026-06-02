@@ -2,7 +2,6 @@ package com.example.sourceformapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 
@@ -54,38 +53,6 @@ class LoginActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_login)
 
-        // ------------------------------------
-        // Backend Auto Discovery
-        // ------------------------------------
-
-        BackendDiscovery.discoverBackend(this) {
-
-                backendUrl ->
-
-            runOnUiThread {
-
-                RetrofitClient.setBaseUrl(
-                    backendUrl
-                )
-
-                Toast.makeText(
-
-                    this,
-
-                    "Backend Found:\n$backendUrl",
-
-                    Toast.LENGTH_LONG
-
-                ).show()
-
-                Log.d(
-
-                    "DISCOVERY",
-
-                    backendUrl
-                )
-            }
-        }
 
         // ------------------------------------
         // Firebase Init
