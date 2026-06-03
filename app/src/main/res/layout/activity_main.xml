@@ -100,7 +100,193 @@
 
                 android:layout_marginStart="8dp"/>
         </LinearLayout>
+        <!-- SESSION STATUS CARD -->
 
+        <LinearLayout
+
+            android:id="@+id/cardSession"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="18dp"
+
+            android:layout_marginBottom="14dp"
+
+            android:background="@drawable/session_card_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="Current Session"
+
+                android:textColor="#FFFFFF"
+
+                android:textSize="18sp"
+
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvSessionUser"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Authenticated User"
+
+                android:textColor="#22C55E"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="12dp"/>
+
+            <TextView
+                android:id="@+id/tvSessionBackend"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Cloud Backend Connected"
+
+                android:textColor="#22C55E"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvSessionEncryption"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Encryption Enabled"
+
+                android:textColor="#22C55E"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvSessionStorage"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Secure Storage Active"
+
+                android:textColor="#22C55E"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+        <!-- SECURITY STATUS CARD -->
+
+        <LinearLayout
+
+            android:id="@+id/cardSecurityStatus"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="18dp"
+
+            android:layout_marginBottom="18dp"
+
+            android:background="@drawable/security_card_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="Security Status"
+
+                android:textColor="#FFFFFF"
+
+                android:textSize="18sp"
+
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvFirebaseStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Firebase Authentication Active"
+
+                android:textColor="#60A5FA"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="12dp"/>
+
+            <TextView
+                android:id="@+id/tvEncryptionStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Metadata Encryption Active"
+
+                android:textColor="#60A5FA"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvHashStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ SHA-256 Verification Active"
+
+                android:textColor="#60A5FA"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvAuditStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Audit Logging Active"
+
+                android:textColor="#60A5FA"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tvDownloadStatus"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="✓ Secure Download Protection Active"
+
+                android:textColor="#60A5FA"
+
+                android:textStyle="bold"
+
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
         <!-- MAIN CARD -->
 
         <LinearLayout
@@ -232,7 +418,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="0 / 140 words"
+                android:text="Description Length: 0 / 140 words"
 
                 android:textColor="#B3B3B3"
 
@@ -274,7 +460,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="No file selected"
+                android:text="📄 No Secure Document Selected"
 
                 android:textColor="#D1D5DB"
 
@@ -283,8 +469,6 @@
                 android:textSize="13sp"
 
                 android:layout_marginTop="10dp"/>
-
-            <!-- QR BUTTON -->
 
             <!-- SUBMIT -->
 
@@ -346,7 +530,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="Upload Successful"
+                    android:text="🔒 Secure Upload Successful"
 
                     android:textColor="#FFFFFF"
 
@@ -358,16 +542,254 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:text="Form submitted to cloud backend"
+                    android:text="✓ Metadata Encrypted"
 
                     android:textColor="#E7FCEB"
 
-                    android:textSize="13sp"
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="✓ SHA-256 Hash Generated"
+
+                    android:textColor="#E7FCEB"
+
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="✓ Audit Event Recorded"
+
+                    android:textColor="#E7FCEB"
+
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="✓ Stored in Protected Cloud Storage"
+
+                    android:textColor="#E7FCEB"
+
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="✓ Ready for Secure Retrieval"
+
+                    android:textColor="#E7FCEB"
+
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+            <!-- ACCOUNT INFORMATION -->
+
+            <LinearLayout
+
+                android:id="@+id/cardAccount"
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+
+                android:padding="18dp"
+
+                android:layout_marginTop="18dp"
+
+                android:layout_marginBottom="12dp"
+
+                android:background="@drawable/account_card_bg">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Account Information"
+
+                    android:textColor="#FFFFFF"
+
+                    android:textSize="18sp"
+
+                    android:textStyle="bold"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Signed In As"
+
+                    android:textColor="#9CA3AF"
+
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+
+                    android:id="@+id/tvUserEmail"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Loading..."
+
+                    android:textColor="#FFFFFF"
+
+                    android:textStyle="bold"
+
+                    android:textSize="15sp"
+
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Authentication Provider"
+
+                    android:textColor="#9CA3AF"
+
+                    android:textStyle="bold"
+
+                    android:layout_marginTop="14dp"/>
+
+                <TextView
+
+                    android:id="@+id/tvAuthProvider"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Firebase"
+
+                    android:textColor="#FFFFFF"
+
+                    android:textStyle="bold"
+
+                    android:textSize="15sp"
 
                     android:layout_marginTop="4dp"/>
 
             </LinearLayout>
+            <!-- SECURITY INFORMATION -->
 
+            <LinearLayout
+
+                android:id="@+id/securityInfoPanel"
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+
+                android:padding="18dp"
+
+                android:layout_marginBottom="12dp"
+
+                android:background="@drawable/security_panel_bg">
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Security Information"
+
+                    android:textColor="#FFFFFF"
+
+                    android:textSize="18sp"
+
+                    android:textStyle="bold"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Authentication: Firebase Authentication"
+
+                    android:textColor="#D1D5DB"
+
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Encryption: Metadata Protection"
+
+                    android:textColor="#D1D5DB"
+
+                    android:layout_marginTop="6dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Integrity: SHA-256 Verification"
+
+                    android:textColor="#D1D5DB"
+
+                    android:layout_marginTop="6dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Storage: Firebase Cloud Storage"
+
+                    android:textColor="#D1D5DB"
+
+                    android:layout_marginTop="6dp"/>
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Monitoring: Security Audit Logging"
+
+                    android:textColor="#D1D5DB"
+
+                    android:layout_marginTop="6dp"/>
+
+            </LinearLayout>
             <!-- LOGOUT -->
 
             <Button

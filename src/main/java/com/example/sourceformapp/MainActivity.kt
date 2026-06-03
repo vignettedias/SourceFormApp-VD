@@ -27,7 +27,7 @@ import com.google.firebase.storage.FirebaseStorage
 
 import java.util.UUID
 
-class MainActivityFirebase : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     // -----------------------------------------
     // INPUTS
