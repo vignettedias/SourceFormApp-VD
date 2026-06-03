@@ -62,7 +62,11 @@ class LoginActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        if (sessionManager.isLoggedIn()) {
+        if (
+            sessionManager.isLoggedIn()
+            ||
+            FirebaseAuth.getInstance().currentUser != null
+        ) {
 
             startActivity(
                 Intent(
@@ -219,7 +223,20 @@ class LoginActivity : AppCompatActivity() {
 
         val password =
             etPassword.text.toString().trim()
+        if (
+            name.isEmpty() ||
+            email.isEmpty() ||
+            password.isEmpty()
+        ) {
 
+            Toast.makeText(
+                this,
+                "Please fill all fields",
+                Toast.LENGTH_LONG
+            ).show()
+
+            return
+        }
         progressBar.visibility =
             View.VISIBLE
 
@@ -270,6 +287,24 @@ class LoginActivity : AppCompatActivity() {
                                 true
                             )
 
+                            body.user?.let {
+
+                                getSharedPreferences(
+                                    "sourceform_user",
+                                    MODE_PRIVATE
+                                )
+                                    .edit()
+                                    .putString(
+                                        "name",
+                                        it.name
+                                    )
+                                    .putString(
+                                        "email",
+                                        it.email
+                                    )
+                                    .apply()
+                            }
+
                             Toast.makeText(
 
                                 this@LoginActivity,
@@ -299,7 +334,7 @@ class LoginActivity : AppCompatActivity() {
 
                             this@LoginActivity,
 
-                            "Signup Failed",
+                            response.message(),
 
                             Toast.LENGTH_LONG
 
@@ -341,7 +376,19 @@ class LoginActivity : AppCompatActivity() {
 
         val password =
             etPassword.text.toString().trim()
+        if (
+            email.isEmpty() ||
+            password.isEmpty()
+        ) {
 
+            Toast.makeText(
+                this,
+                "Please enter email and password",
+                Toast.LENGTH_LONG
+            ).show()
+
+            return
+        }
         progressBar.visibility =
             View.VISIBLE
 
@@ -390,7 +437,23 @@ class LoginActivity : AppCompatActivity() {
                             sessionManager.setLoggedIn(
                                 true
                             )
+                            body.user?.let {
 
+                                getSharedPreferences(
+                                    "sourceform_user",
+                                    MODE_PRIVATE
+                                )
+                                    .edit()
+                                    .putString(
+                                        "name",
+                                        it.name
+                                    )
+                                    .putString(
+                                        "email",
+                                        it.email
+                                    )
+                                    .apply()
+                            }
                             Toast.makeText(
 
                                 this@LoginActivity,
@@ -420,7 +483,7 @@ class LoginActivity : AppCompatActivity() {
 
                             this@LoginActivity,
 
-                            "Invalid Credentials",
+                            response.message(),
 
                             Toast.LENGTH_LONG
 
@@ -489,7 +552,8 @@ class LoginActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
 
                 ).show()
-
+                sessionManager.setLoggedIn(true)
+                saveOAuthUser()
                 startActivity(
 
                     Intent(
@@ -614,7 +678,8 @@ class LoginActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
 
                     ).show()
-
+                    sessionManager.setLoggedIn(true)
+                    saveOAuthUser()
                     startActivity(
 
                         Intent(
@@ -693,7 +758,8 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
 
                             ).show()
-
+                            sessionManager.setLoggedIn(true)
+                            saveOAuthUser()
                             startActivity(
 
                                 Intent(
@@ -749,5 +815,25 @@ class LoginActivity : AppCompatActivity() {
             resultCode,
             data
         )
+    }
+    private fun saveOAuthUser() {
+
+        auth.currentUser?.let { user ->
+
+            getSharedPreferences(
+                "sourceform_user",
+                MODE_PRIVATE
+            )
+                .edit()
+                .putString(
+                    "name",
+                    user.displayName ?: "OAuth User"
+                )
+                .putString(
+                    "email",
+                    user.email ?: "Unknown User"
+                )
+                .apply()
+        }
     }
 }

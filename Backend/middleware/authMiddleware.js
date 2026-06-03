@@ -132,15 +132,17 @@ async function verifyAuth(
 
             req.user = {
 
-                id:
-                    decodedFirebase.uid,
+    id:
+        decodedFirebase.uid,
 
-                email:
-                    decodedFirebase.email,
+    email:
+        decodedFirebase.email
+        ||
+        "facebook-user@oauth.local",
 
-                authType:
-                    "firebase"
-            }
+    authType:
+        "firebase"
+}
 
             console.log(
                 "FIREBASE USER AUTHENTICATED:"

@@ -882,7 +882,8 @@ await admin
             fileHash,
 
         authEmail:
-            req.user.email,
+    req.user.email
+    || null,
 
         authType:
             req.user.authType,
