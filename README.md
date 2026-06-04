@@ -1,323 +1,357 @@
-# 🔥 SourceForm Secure Cloud Intake System
+# 🔥 SourceForm – Secure Cloud Intake Platform
 
-A modern secure Android + Node.js full-stack application for authenticated form submissions, secure file uploads, backend discovery, and cloud-based storage.
+## Overview
 
-Built using:
+SourceForm is an enterprise-inspired secure document intake platform designed to demonstrate modern Android development, cloud-native backend engineering, cybersecurity principles, secure file handling, and defense-in-depth architecture.
 
-* Kotlin Android
-* Firebase Authentication
-* Node.js + Express.js
-* MongoDB Atlas
-* Retrofit Networking
-* Secure Upload Validation
-* Cybersecurity Hardening
+The platform enables authenticated users to securely submit documents from an Android application to a hardened cloud backend while enforcing authentication, integrity verification, metadata protection, audit logging, and controlled document access.
+
+Unlike traditional upload systems, SourceForm intentionally prevents direct storage access and instead utilizes backend-controlled signed URL issuance for secure document retrieval.
 
 ---
 
-# 🚀 Features
+# 🚀 Core Features
 
 ## 📱 Android Application
 
-* Modern dark-themed UI
-* Animated success feedback
-* Form validation
-* Dynamic backend connection
-* QR-based backend discovery
-* Secure file uploads
-* Firebase OAuth authentication
-* Retrofit networking
-* Real-time backend status
+Built using Kotlin and Android SDK.
+
+Features include:
+
+* Modern security-focused user interface
+* Hybrid authentication support
+* Secure form submission workflow
+* Document upload support
+* Real-time backend communication
+* Session management
+* Automatic logout after submission
+* Inactivity timeout protection
+* Secure token-based communication
+* Cloud-integrated workflow
 
 ---
 
-## 🔐 Authentication
+## 🔐 Hybrid Authentication System
 
-Supported login mechanisms:
+SourceForm supports multiple authentication methods:
 
-* Google OAuth
-* GitHub OAuth
-* Facebook OAuth
+### OAuth Providers
 
-Backend verifies Firebase authentication tokens before accepting uploads.
+* Google Authentication
+* Facebook Authentication
+* GitHub Authentication
+
+### Native Authentication
+
+* Backend-managed registration
+* JWT-based login
+* Secure session persistence
+
+Authentication tokens are verified before any protected operation is allowed.
 
 ---
 
-## 📁 Secure Upload System
+# 📁 Secure Document Submission Pipeline
 
-Supports:
+Every upload passes through a hardened processing pipeline:
+
+```text
+User Submission
+        ↓
+Authentication Verification
+        ↓
+Input Validation
+        ↓
+File Validation
+        ↓
+Integrity Hash Generation
+        ↓
+Metadata Encryption
+        ↓
+Audit Logging
+        ↓
+Private Cloud Storage
+        ↓
+Firestore Metadata Storage
+```
+
+Supported formats:
 
 * PDF
 * DOC
 * DOCX
 
-Security protections:
+---
 
-* File extension validation
-* MIME type validation
-* Executable signature detection
-* File signature verification
-* Safe randomized filenames
-* File size limiting
+# 🛡️ Security Architecture
+
+## Defense-in-Depth Design
+
+Security controls exist across every layer of the system.
+
+### Authentication Layer
+
+* Firebase OAuth Verification
+* JWT Verification
+* Protected API Routes
+* Session Validation
+
+### Backend Security
+
+* Helmet Security Headers
+* Rate Limiting
+* Input Validation
+* Error Isolation
+* Request Sanitization
+* Abuse Prevention
+
+### Upload Security
+
+* MIME Type Validation
+* Extension Validation
+* Upload Restrictions
+* Secure Multipart Processing
+* Size Limiting
+* Filename Randomization
 
 ---
 
-# 🛡️ Cybersecurity Features
+# 🔒 Metadata Encryption
 
-## Backend Security
+Sensitive submission metadata is encrypted before storage using a custom Fernet-compatible cryptographic implementation.
 
-* Helmet security headers
-* Rate limiting
-* Suspicious activity logging
-* Firebase token verification
-* Protected API routes
-* Input sanitization
-* Global error handling
+Protected fields include:
 
----
+* File metadata
+* Submission details
+* Storage references
+* User-associated information
 
-## Upload Security
-
-* Executable blocking
-* Binary signature inspection
-* Upload throttling
-* Abuse prevention
-* Secure multipart handling
+This reduces metadata exposure even in the event of database compromise.
 
 ---
 
-# ☁️ Cloud Integration
+# ✅ SHA-256 Integrity Verification
+
+Every uploaded document receives a cryptographic SHA-256 fingerprint.
+
+Integrity verification allows:
+
+* Tamper detection
+* Consistency validation
+* Forensic verification
+* Secure retrieval validation
+
+The platform can verify whether a stored file remains unchanged from its original uploaded state.
+
+---
+
+# 📜 Audit Logging
+
+Security-relevant events are recorded through an audit subsystem.
+
+Examples include:
+
+* Authentication events
+* Upload operations
+* Retrieval requests
+* Integrity verification events
+* Security exceptions
+
+This improves accountability and supports security monitoring.
+
+---
+
+# ☁️ Private Storage Architecture
+
+SourceForm intentionally uses a deny-by-default storage model.
+
+Storage rules are configured to prevent direct public access:
+
+```text
+allow read, write: if false;
+```
+
+Uploaded documents are not publicly accessible.
+
+This prevents:
+
+* Direct URL access
+* Bucket browsing
+* Unauthorized downloads
+* Security bypasses
+
+---
+
+# 🔗 Signed URL Access Control
+
+Document retrieval follows a secure backend-mediated process:
+
+```text
+Authenticated Request
+        ↓
+Authorization Validation
+        ↓
+Metadata Retrieval
+        ↓
+Integrity Verification
+        ↓
+Audit Logging
+        ↓
+Signed URL Generation
+        ↓
+Temporary Secure Access
+```
+
+Characteristics:
+
+* Time-limited access
+* Backend-generated URLs
+* Auditable downloads
+* No permanent public links
+* Controlled retrieval workflow
+
+---
+
+# ☁️ Cloud Infrastructure
 
 ## Firebase
 
 Used for:
 
 * Authentication
-* OAuth providers
-* Token management
+* OAuth Providers
+* Identity Management
+* Token Verification
 
----
+## Cloud Firestore
+
+Used for:
+
+* Submission Metadata
+* Audit Records
+* Secure Document References
+
+## Firebase Storage
+
+Used for:
+
+* Private File Storage
+* Signed URL Retrieval Model
+
+## Google Cloud Run
+
+Used for:
+
+* Backend Deployment
+* API Hosting
+* Scalable Request Processing
 
 ## MongoDB Atlas
 
 Used for:
 
-* Cloud data persistence
-* Form submission storage
-* Scalable backend database architecture
+* Native Authentication Users
+* JWT Authentication Infrastructure
 
 ---
 
-# 🧩 Project Architecture
+# 🔄 Session Security
+
+SourceForm includes active session protection mechanisms:
+
+### Automatic Logout
+
+Users are automatically logged out:
+
+* 5 seconds after successful submission
+* After prolonged inactivity
+
+This minimizes session persistence risk.
+
+---
+
+# 🧩 System Architecture
 
 ```text
-ANDROID APP
-     ↓
-Retrofit Networking Layer
-     ↓
-Firebase Authentication Token
-     ↓
-Secure Express.js Backend
-     ↓
-MongoDB Atlas Cloud Database
+ANDROID APPLICATION
+        │
+        ▼
+Hybrid Authentication Layer
+(JWT + OAuth)
+        │
+        ▼
+Retrofit Networking
+        │
+        ▼
+Cloud Run Backend
+(Node.js + Express)
+        │
+ ┌──────┼──────────┐
+ ▼      ▼          ▼
+Firestore Storage Audit Logs
+ ▼
+Private Firebase Storage
+        │
+        ▼
+Signed URL Retrieval
 ```
 
 ---
 
-# 📚 Technologies Used
+# 📚 Technology Stack
 
-| Category        | Technologies          |
-| --------------- | --------------------- |
-| Mobile          | Kotlin, Android SDK   |
-| Backend         | Node.js, Express.js   |
-| Database        | MongoDB Atlas         |
-| Authentication  | Firebase Auth         |
-| Networking      | Retrofit, OkHttp      |
-| Upload Handling | Multer                |
-| Security        | Helmet, Rate Limiting |
-| QR Scanning     | ZXing                 |
-| Cloud           | Firebase + MongoDB    |
-
----
-
-# 📂 Project Structure
-
-```text
-SourceForm/
-
-├── app/
-│   ├── src/
-│   ├── res/
-│   └── java/
-│
-├── Backend/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── uploads/
-│   ├── firebaseAdmin.js
-│   ├── server.js
-│   └── package.json
-```
+| Category       | Technologies                                 |
+| -------------- | -------------------------------------------- |
+| Mobile         | Kotlin, Android SDK                          |
+| Authentication | Firebase Auth, JWT                           |
+| Backend        | Node.js, Express.js                          |
+| Database       | MongoDB Atlas, Firestore                     |
+| Storage        | Firebase Storage                             |
+| Networking     | Retrofit, OkHttp                             |
+| Security       | Helmet, Rate Limiting                        |
+| Cloud          | Google Cloud Run                             |
+| Cryptography   | SHA-256, Custom Fernet-Compatible Encryption |
+| OAuth          | Google, Facebook, GitHub                     |
 
 ---
 
-# ⚙️ Setup Instructions
+# 🏗️ Key Cybersecurity Concepts Demonstrated
 
-# 1️⃣ Clone Repository
-
-```bash
-git clone <repository-url>
-```
-
----
-
-# 2️⃣ Backend Setup
-
-Navigate to backend folder:
-
-```bash
-cd Backend
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Create:
-
-```text
-.env
-```
-
-Add:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-```
-
-Place Firebase Admin SDK file:
-
-```text
-firebase-service-account.json
-```
-
-inside:
-
-```text
-Backend/
-```
-
-Run backend:
-
-```bash
-node server.js
-```
+* Defense-in-Depth
+* Zero Trust Principles
+* Private Storage Architecture
+* Secure File Handling
+* OAuth Authentication
+* JWT Authentication
+* Audit Logging
+* Cryptographic Integrity Verification
+* Metadata Protection
+* Signed URL Access Control
+* Secure Cloud Deployment
+* Session Security Controls
 
 ---
 
-# 3️⃣ Android Setup
+# 🎯 Educational Objectives
 
-Open project in:
+This project was developed as a practical demonstration of:
 
-```text
-Android Studio
-```
-
-Sync Gradle.
-
-Add:
-
-```text
-google-services.json
-```
-
-inside:
-
-```text
-app/
-```
-
-Run application.
-
----
-
-# 📷 Backend QR Discovery
-
-The backend automatically:
-
-* detects local IP
-* generates QR code
-* allows Android app to dynamically connect
-
----
-
-# 🔐 Security Highlights
-
-Implemented protections against:
-
-* brute-force attacks
-* upload abuse
-* malformed requests
-* unauthorized uploads
-* executable uploads
-* token forgery
-* API flooding
-
----
-
-# 🚀 Future Improvements
-
-Planned:
-
-* JWT-based native authentication
-* HTTPS deployment
-* Certificate pinning
-* Cloud deployment
-* Admin dashboard
-* Malware scanning
-* Dockerization
-* Cloudflare integration
-* Audit logging
-* CI/CD pipelines
-
----
-
-# 📖 Educational Purpose
-
-This project was also built as a:
-
-```text
-full-stack cybersecurity + mobile development learning system
-```
-
-covering:
-
-* secure backend architecture
-* Android networking
-* authentication systems
-* upload security
-* API hardening
-* cloud integration
-* modern UI/UX
-
----
-
-# 👨‍💻 Author
-
-Developed as part of:
-
-```text
-Summer Internship Project
-```
-
-Focused on:
-
-* Secure Full-Stack Engineering
-* Android Development
-* Backend Security
+* Android Application Development
+* Secure Backend Engineering
+* Cloud Computing
+* API Security
+* Authentication Systems
+* Secure Storage Architectures
+* Cryptographic Integrity Controls
 * Cybersecurity Fundamentals
+* Cloud-Native Deployment Practices
+
+---
+
+# 👨‍💻 Project Context
+
+Developed as part of a cybersecurity-focused full-stack engineering internship project emphasizing secure software design, modern cloud architecture, and practical security engineering principles.
 
 ---
 
@@ -325,10 +359,9 @@ Focused on:
 
 This project is intended for:
 
-* educational purposes
-* portfolio demonstrations
-* security learning
-* full-stack development practice
-
-```
-```
+* Educational Use
+* Security Research
+* Portfolio Demonstrations
+* Internship Showcases
+* Full-Stack Development Learning
+* Cybersecurity Practice
